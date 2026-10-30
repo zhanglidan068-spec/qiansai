@@ -23,6 +23,7 @@ from .experiments import ROOT, _freeze_sources, config_hash, dump
 from .fixed_schedule import GRID_MAPPINGS, ALL_MAPPINGS, mapping_traits
 from .fixed_simulation import simulate
 from .reporting import _csv
+from .reference_data import reference_report_path
 
 
 STUDY_ID = 'array_grid_p20_33_q4_6_8_ln64_local64k'
@@ -30,7 +31,7 @@ ROWS = tuple(range(20,34))
 COLUMNS = (4,6,8)
 OPERATORS = ('projection','ffn2')
 TARGET = 'A26x8'
-REFERENCE_REPORT = ROOT/'hw_model'/'reports'/'architecture_study_ln64_20261029_v1'
+REFERENCE_REPORT = reference_report_path('architecture_study_ln64_20261029_v1')
 REVISION_SPEC = 'hw_model/spec/user_revision_20261029_array_grid.md'
 PROFILE_PATH = 'hw_model/configs/ln64_local64k.json'
 OVERLAP_MAPPINGS = ('A32x4','A32x8','A33x4','A33x8')

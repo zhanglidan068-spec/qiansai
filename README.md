@@ -33,6 +33,8 @@ Git 保存源码、配置、测试、说明文档和 `.vscode` 配置。以下�
 
 因此，仅克隆本仓库不会包含模型权重、数据集和历史实验输出。完整推理前，请按 FP32 手册准备官方 `ARM-software/keyword-transformer`，参考版本 `237e4097`，以及对应 KWT-1 权重和数据。硬件行为模型可按自身说明独立运行。
 
+硬件行为模型的回归参考摘要和配置保存在 `hw_model/reference_results/`，随仓库提供；它们用于校验此前结果，不包含训练样本或大体积 trace。使用 Python 3.8+ 可直接运行 `python -m hw_model.array_grid_study --out hw_model/reports/array_grid_new --workers 4`，生成本机的新验证报告。
+
 ## 面积估算
 
 `estimate_kwt_area.py` 提供公开参考工艺的预算；`estimate_kwt_smic40_26x4.py` 针对 SMIC40-2025 目标和 26×4 阵列建立 40nm 参考预算。两者均不等同于指定工艺综合结果。实际面积、150 MHz 时序和赛题达标情况需使用赛方标准单元库、存储宏及完整 RTL 验证。

@@ -11,6 +11,8 @@
 
 数据集、运行环境、上游权重、`runs/` 和 `hw_model/reports/` 等输出被忽略，不会出现在普通待提交列表中。本地文件不会因此被删除。
 
+`hw_model/reference_results/` 是研究入口必需的回归摘要和配置，随 Git 保存；它与忽略的完整历史报告和大体积轨迹分开。硬件行为仿真克隆后可直接用 Python 标准库运行，参见 `hw_model/README.md`。
+
 ## 在 VS Code 终端中操作
 
 ```powershell

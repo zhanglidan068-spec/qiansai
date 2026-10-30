@@ -1,0 +1,34 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "architecture_study_20261029_v1/run_config.json": {
+      "bytes": 1955,
+      "sha256": "a743bc52ba1503c1701a53dc4a879f5084c858371634ef7527cde7ca6e7ac417"
+    },
+    "architecture_study_20261029_v1/summary.json": {
+      "bytes": 339169,
+      "sha256": "7d4ec95f40f0fae8677335f1e036f2ae02e60556dfe595ab449d174a8bdc49d7"
+    },
+    "architecture_study_ln64_20261029_v1/historical_regression.json": {
+      "bytes": 304440,
+      "sha256": "dc18117f7ee5c55f08f3e50cfd17ef9048478a777d3965ccad0abdfd763125c0"
+    },
+    "architecture_study_ln64_20261029_v1/run_config.json": {
+      "bytes": 1970,
+      "sha256": "1b7375f78d13e5d8ffbba603e5cbc1b829958f3b1f33588eb42f01fc592745f1"
+    },
+    "architecture_study_ln64_20261029_v1/summary.json": {
+      "bytes": 2433382,
+      "sha256": "2e445d9ae15e1e92018cb4ce6a905994c77022e8611055953bdae86f92c8feb6"
+    },
+    "fixed300_20261029_v2/run_config.json": {
+      "bytes": 1955,
+      "sha256": "a743bc52ba1503c1701a53dc4a879f5084c858371634ef7527cde7ca6e7ac417"
+    },
+    "fixed300_20261029_v2/summary.json": {
+      "bytes": 155146,
+      "sha256": "880e58e9697dd04b61d5af9c5b9a9c5560e5e3922ffd7cecf17022b16b96e8a9"
+    }
+  },
+  "schema_version": 1
+}

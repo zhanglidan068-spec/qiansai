@@ -19,13 +19,14 @@ from .fixed_memory import LocalCapacityError
 from .fixed_schedule import MAPPINGS, EXPERIMENTAL_MAPPINGS, REVISION_MAPPINGS, mapping_traits
 from .fixed_simulation import simulate
 from .reporting import _csv, _flat
+from .reference_data import reference_report_path
 
 
 OPERATORS = ('projection', 'ffn2')
 # Keep this independent 32 KiB experiment at its recorded twenty mappings;
 # later registry extensions belong to the separate 64 KiB / LN64 study.
 STUDY_MAPPINGS = MAPPINGS + EXPERIMENTAL_MAPPINGS + REVISION_MAPPINGS
-REFERENCE_REPORT = ROOT/'hw_model'/'reports'/'architecture_study_20261029_v1'
+REFERENCE_REPORT = reference_report_path('architecture_study_20261029_v1')
 REVISION_SPEC = 'hw_model/spec/user_revision_20261029_ln64_local32k.md'
 BOUNDARY = 'first_weight_request_to_final_internal_int8_output_ack'
 STUDY_ID = 'architecture_shapes_local32k_ln64'

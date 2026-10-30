@@ -1,5 +1,16 @@
 # KWT 固定 300 MB/s 软件行为模型
 
+## 从 GitHub 克隆后运行
+
+硬件行为仿真仅依赖 Python 3.8+ 标准库，不需要 TensorFlow、数据集或模型权重。在仓库根目录执行：
+
+```powershell
+python -m unittest discover -s hw_model/tests
+python -m hw_model.array_grid_study --out hw_model/reports/array_grid_new --workers 4
+```
+
+下文保留本机 `.\.conda\python.exe` 命令示例；在其他环境中将解释器替换为 `python` 或自己的 Python 路径即可。`reference_results/` 随 Git 保存研究入口所需的小型回归摘要及配置，并核验原始文件 SHA-256；因此不依赖本机被忽略的 `reports/` 历史目录。新生成的报告、逐事件轨迹和完整源码快照仍输出到 `reports/`，不加入 Git。
+
 最新组合验证采用 **阵列行数 20～33（含端点）、列数 4/6/8 的全部 42 种形状**，继续使用 LN 核心 L=64、II=64，以及八个 4096×16 bit 单端口宏，共 64 KiB。上一轮不限规模的 LN64 研究、独立的 32 KiB/LN64 配置和既有 64 KiB/LN128 报告均保留，按各自候选集合与条件回归。
 
 当前活动版本依据 [2026-10-29 修改条款](spec/amendment_300MBps.html)，使用 schema 2。默认基线比较同一 300 MB/s 权重通路下两种硬件架构的四种调度：A、B0、B1_G9、B1_G99，各运行输出投影与 FFN2，共八个详细结果。B1 是 B 单元的调度变体，不是第三种硬件架构。新增计算形状的研究使用下述独立实验入口，不改变默认基线映射集合。

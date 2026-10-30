@@ -18,13 +18,14 @@ from .experiments import ROOT, _freeze_sources, config_hash, dump
 from .fixed_schedule import mapping_traits
 from .fixed_simulation import simulate
 from .reporting import _csv, _flat
+from .reference_data import reference_report_path
 
 
 BASELINE_MAPPINGS = ('A', 'B0', 'B1_G9', 'B1_G99')
 NEW_MAPPINGS = ('A18x8', 'A16x8', 'A32x4', 'B1_G11')
 STUDY_MAPPINGS = BASELINE_MAPPINGS + NEW_MAPPINGS
 OPERATORS = ('projection', 'ffn2')
-BASELINE_REPORT = ROOT/'hw_model'/'reports'/'fixed300_20261029_v2'
+BASELINE_REPORT = reference_report_path('fixed300_20261029_v2')
 BOUNDARY = 'first_weight_request_to_final_internal_int8_output_ack'
 
 

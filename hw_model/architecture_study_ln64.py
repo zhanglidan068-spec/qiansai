@@ -18,11 +18,12 @@ from .config import LN64_LOCAL64K_CONFIG, LN64_LOCAL64K_PROFILE_ID, load_config,
 from .experiments import ROOT, _freeze_sources, config_hash, dump
 from .fixed_schedule import ALL_MAPPINGS
 from .reporting import _csv
+from .reference_data import reference_report_path
 
 
 STUDY_ID = 'architecture_shapes_local64k_ln64'
 OPERATORS = ('projection', 'ffn2')
-REFERENCE_REPORT = ROOT/'hw_model'/'reports'/'architecture_study_20261029_v1'
+REFERENCE_REPORT = reference_report_path('architecture_study_20261029_v1')
 REVISION_SPEC = 'hw_model/spec/user_revision_20261029_ln64_local64k.md'
 PROFILE_PATH = 'hw_model/configs/ln64_local64k.json'
 PARETO_AXES = {'cycles_multipliers':'physical_multipliers',
