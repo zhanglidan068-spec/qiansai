@@ -1,0 +1,7 @@
+{
+  "architecture": {"weight_cache": "tile"},
+  "provenance": {
+    "scenario_id": "assumed_bus16_banks8_tile_cold",
+    "assumption_status": "hypothetical_platform_not_rtl_calibrated"
+  }
+}

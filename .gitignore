@@ -1,0 +1,39 @@
+.conda/
+.conda-pkgs/
+.pip-cache/
+.tmp/
+.vscode-user/
+.vscode-extensions/
+downloads/
+data2/
+logs/
+runs/
+keyword-transformer/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated reports and rendered PDF pages stay on this machine.
+/tmp/
+/hw_model/reports/
+
+# Local credentials and environment settings.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Model binaries are prepared locally; source and configuration are versioned.
+*.h5
+*.hdf5
+*.ckpt
+*.ckpt.*
+*.tflite
+*.onnx
+
+Thumbs.db
+Desktop.ini
+.DS_Store

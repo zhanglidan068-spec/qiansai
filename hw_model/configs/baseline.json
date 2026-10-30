@@ -1,0 +1,73 @@
+{
+  "schema_version": 2,
+  "model": {
+    "tokens": 99,
+    "hidden": 64,
+    "ffn": 256,
+    "layers": 12,
+    "commit": "237e4097"
+  },
+  "scope": "fused_subgraphs_fixed300",
+  "numeric": {
+    "activation_bits": 8,
+    "weight_bits": 8,
+    "accumulator_bits": 32,
+    "pre_ln_bits": 16,
+    "output_bits": 8,
+    "bias_bits": 32,
+    "ln_parameter_bits": 16,
+    "rounding": "nearest_even",
+    "overflow": "saturate"
+  },
+  "platform": {
+    "shared_bytes": 524288,
+    "clock_hz": 150000000,
+    "weight_beat_bytes": 4,
+    "weight_accept_interval": 2,
+    "weight_read_latency": 3,
+    "weight_max_outstanding": 2,
+    "weight_bytes_per_second": 300000000
+  },
+  "local_memory": {
+    "banks": 8,
+    "depth_words": 4096,
+    "word_bytes": 2,
+    "port_mode": "single",
+    "read_latency": 1,
+    "byte_write_mask": true
+  },
+  "architecture": {
+    "weight_register_groups": 2,
+    "multiply_latency": 1,
+    "accumulator_feedback": 1,
+    "activation_operand_slots": 2,
+    "post_channels_per_cycle": 8,
+    "post_latency": 2,
+    "result_channels_per_cycle": 8,
+    "b1_partial_storage": "sram"
+  },
+  "ln": {
+    "model_level": "row_event",
+    "latency_cycles": 128,
+    "initiation_interval_cycles": 128,
+    "max_inflight_rows": 1,
+    "epsilon": 0.000001
+  },
+  "provenance": {
+    "scenario_id": "fixed300_local64k",
+    "platform_revision": null,
+    "checkpoint_id": "metadata_only",
+    "seed": 0,
+    "initial_state": "local_activations_parameters_ready_weight_registers_empty",
+    "source_document_sha256": "2264e7774260213a9783e5e41665b7ac8298464aa35e7ce6aa4ddc797ab8990b",
+    "amendment_sha256": "d76843a1aaa0907559e645f34eb58ee8e0c3fb1c7e9ad4d06f43d802ab07711f",
+    "assumption_status": "fixed_contract_not_rtl_calibrated"
+  },
+  "area": {
+    "limit_mm2": 2.25,
+    "standard_cells_mm2": null,
+    "macro_areas_mm2": {
+      "4096_single": null
+    }
+  }
+}

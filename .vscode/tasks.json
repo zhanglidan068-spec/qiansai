@@ -1,0 +1,171 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "KWT-1: smoke",
+      "type": "process",
+      "command": "${workspaceFolder}/.conda/python.exe",
+      "args": [
+        "${workspaceFolder}/run_kwt_fp32.py",
+        "--repo",
+        "keyword-transformer",
+        "--smoke",
+        "--out",
+        "runs/smoke"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "KWT-1: validation 32",
+      "type": "process",
+      "command": "${workspaceFolder}/.conda/python.exe",
+      "args": [
+        "${workspaceFolder}/run_kwt_fp32.py",
+        "--repo",
+        "keyword-transformer",
+        "--data-dir",
+        "data2",
+        "--split",
+        "validation",
+        "--limit",
+        "32",
+        "--batch-size",
+        "1",
+        "--out",
+        "runs/validation_32"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "KWT-1: full validation",
+      "type": "process",
+      "command": "${workspaceFolder}/.conda/python.exe",
+      "args": [
+        "${workspaceFolder}/run_kwt_fp32.py",
+        "--repo",
+        "keyword-transformer",
+        "--data-dir",
+        "data2",
+        "--split",
+        "validation",
+        "--limit",
+        "0",
+        "--batch-size",
+        "32",
+        "--out",
+        "runs/validation_full"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "KWT-1: W16A16 + FP32 nonlinear",
+      "type": "process",
+      "command": "${workspaceFolder}/.conda/python.exe",
+      "args": [
+        "${workspaceFolder}/run_kwt_int16.py",
+        "--repo",
+        "keyword-transformer",
+        "--data-dir",
+        "data2",
+        "--baseline-run",
+        "runs/validation_full",
+        "--batch-size",
+        "32",
+        "--calibration-samples",
+        "256",
+        "--activation-headroom",
+        "1.25",
+        "--limit",
+        "0"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "CUDA_VISIBLE_DEVICES": "-1",
+          "TEMP": "${workspaceFolder}/.tmp",
+          "TMP": "${workspaceFolder}/.tmp"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "KWT-1: W8A8 + N16 + AV F6 full validation",
+      "type": "process",
+      "command": "${workspaceFolder}/.conda/python.exe",
+      "args": [
+        "${workspaceFolder}/run_kwt_int8_n16.py",
+        "--limit",
+        "0",
+        "--batch-size",
+        "32",
+        "--calibration-samples",
+        "256",
+        "--activation-headroom",
+        "1.25"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "CUDA_VISIBLE_DEVICES": "-1",
+          "TEMP": "${workspaceFolder}/.tmp",
+          "TMP": "${workspaceFolder}/.tmp"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "KWT-1: layer-wise precision search (validation only)",
+      "type": "process",
+      "command": "${workspaceFolder}/.conda/python.exe",
+      "args": [
+        "${workspaceFolder}/run_kwt_precision_experiments.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "CUDA_VISIBLE_DEVICES": "-1",
+          "TEMP": "${workspaceFolder}/.tmp",
+          "TMP": "${workspaceFolder}/.tmp"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}

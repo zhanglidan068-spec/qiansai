@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KWT 硬件行为模型开发技术文档</title><style>
+:root{--ink:#20252b;--muted:#626c78;--line:#d7dfe7;--accent:#17628d;--paper:#fff;--back:#f3f5f7}
+*{box-sizing:border-box}html{scroll-padding-top:22px}
+body{margin:0;background:var(--back);color:var(--ink);font:16px/1.85 'Microsoft YaHei','PingFang SC',sans-serif}
+.layout{max-width:1460px;margin:auto;display:grid;grid-template-columns:270px minmax(0,1fr);gap:30px;padding:32px}
+nav{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow:auto;font-size:13px;line-height:1.65;padding:8px 16px 24px 0}
+.navtitle{font-size:15px;font-weight:700;color:#000;margin-bottom:15px}
+nav ul{list-style:none;padding:0;margin:0}nav li{margin:0 0 9px}nav a{color:#394652;text-decoration:none}
+nav a:hover{color:var(--accent);text-decoration:underline}
+main{min-width:0;background:var(--paper);padding:42px 48px 65px;border:1px solid #e4e8ed;border-radius:8px}
+h1,h2,h3{color:#000;line-height:1.4;letter-spacing:0}
+h1{font-size:30px;margin:0 0 24px}h2{font-size:24px;margin:48px 0 18px}h3{font-size:19px;margin:29px 0 12px}
+p{margin:12px 0 16px}li{margin:7px 0}ul,ol{padding-left:25px}
+strong{font-weight:700}a{color:var(--accent);overflow-wrap:anywhere}
+code{font:0.9em/1.65 Consolas,'Microsoft YaHei',monospace;background:#f0f3f5;padding:2px 5px;border-radius:3px;overflow-wrap:anywhere}
+pre{background:#f3f6f8;padding:18px 20px;border:1px solid #e0e6ec;border-radius:5px;overflow:auto;line-height:1.65}
+pre code{background:none;padding:0;white-space:pre;overflow-wrap:normal;font-size:13px}
+.table-wrap{overflow:auto;margin:20px 0 24px}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.65}
+th,td{border:1px solid #d9d9d9;padding:11px 12px;text-align:left;vertical-align:middle;min-width:65px}
+th{background:#e8eff4;color:#000;font-weight:700}tbody tr:nth-child(even){background:#fafbfd}
+.meta{font-size:12px;color:var(--muted);margin:28px 0 0}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:16px;gap:12px}nav{position:static;max-height:240px;padding:12px}main{padding:28px 24px}h1{font-size:27px}}
+@media print{body{background:white;font-size:10.5pt;line-height:1.6}.layout{display:block;padding:0}nav{display:none}main{padding:0;border:0}h1{font-size:21pt}h2{font-size:16pt;break-after:avoid}h3{font-size:12pt;break-after:avoid}table{font-size:9pt}thead{display:table-header-group}tr{break-inside:avoid}pre{white-space:pre-wrap;overflow:visible}pre code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:8.5pt}.table-wrap{overflow:visible}a{color:inherit;text-decoration:none}@page{size:A4;margin:18mm}}
+</style></head>
+<body><div class="layout"><nav aria-label="章节目录"><div class="navtitle">KWT 硬件行为模型开发</div><div class="toc">
+<ul>
+<li><a href="#1">1 文档目标与交付边界</a></li>
+<li><a href="#2">2 固定工作负载与待确认条件</a></li>
+<li><a href="#3">3 公平比较规则</a></li>
+<li><a href="#4">4 软件组织与公共数据结构</a></li>
+<li><a href="#5">5 时间语义与仿真内核</a></li>
+<li><a href="#6">6 存储与搬运模型</a></li>
+<li><a href="#7">7 两个计算后端的实现</a></li>
+<li><a href="#8-ln">8 残差与 LN 融合模型</a></li>
+<li><a href="#9">9 扩展到完整模型</a></li>
+<li><a href="#10">10 配置模板与实验来源记录</a></li>
+<li><a href="#11_1">11 指标与报告格式</a></li>
+<li><a href="#12_1">12 算术与调度基准</a></li>
+<li><a href="#13-rtl">13 数值验证与 RTL 对接</a></li>
+<li><a href="#14">14 面积与能耗处理</a></li>
+<li><a href="#15">15 实验顺序与停止条件</a></li>
+<li><a href="#16">16 完成检查表</a></li>
+<li><a href="#17">17 参考依据</a></li>
+</ul>
+</div>
+
+<p class="meta">版本 1.0 · 2026-10-28<br>开发规格与验证方法</p></nav><main><h1 id="kwt">KWT 硬件行为模型开发技术文档</h1>
+<p>版本 1.0　日期 2026 年 10 月 28 日</p>
+<p>比较对象：9×16 PE 阵列与逐行 128 乘法器组及可重构加法树</p>
+<h2 id="1">1 文档目标与交付边界</h2>
+<p>在编写完整 RTL 之前，建立一个可复现的软件行为模型，比较两种架构完成同一 KWT 工作负载时的时延、存储访问、缓存需求和资源开销。比较范围必须包含矩阵计算、残差、LayerNorm（LN）、数据格式转换、数据搬运和有限缓存，不能只比较乘法次数或首行输出时间。</p>
+<p>采用一个共用的仿真内核，接入两个计算后端和可替换的调度策略。模型首先解释性能差异来自哪里，再用于筛选硬件方案。最终标准单元面积与工作频率仍由指定库综合核验。</p>
+<p>本文提供开发规格、接口约定、配置示例、计算基准和验收方法。文中的 Python 片段及文件结构是实现模板；除明确标注的算术基准外，不表示完整仿真器已经实现或通过 RTL 校准。</p>
+<p><strong>第一阶段最小可用模型只实现两个融合子图：输出投影 → 残差 → LN，以及 FFN2 → 残差 → LN。</strong> 待它们通过验证，再扩展到完整编码器和十二层。性能模型可先使用张量形状和地址，不必等待语音数据集与量化模型全部就绪。</p>
+<h3 id="11">1.1 必须回答的问题</h3>
+<ol>
+<li>在相同平台接口、数值格式及工作负载下，哪个方案完成全部 99 个 token 更快？</li>
+<li>逐行方案提前启动 LN 的收益，是否会被权重供数等待抵消？</li>
+<li>缓存缩小后，是否增加上游读取，或造成前后级阻塞？</li>
+<li>两种方案各自至少需要哪些 SRAM 宏、寄存器和接口资源？</li>
+<li>在未知共享 SRAM 参数的情况下，结论在什么参数范围内成立？</li>
+</ol>
+<h3 id="12">1.2 三种模型分开维护</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>模型</th>
+<th>输入和作用</th>
+<th>可以支持的结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数值参考模型</td>
+<td>浮点或量化张量，计算真实数值</td>
+<td>逐算子误差、溢出、完整分类准确率</td>
+</tr>
+<tr>
+<td>硬件行为模型</td>
+<td>算子图、地址、资源和时序配置</td>
+<td>周期数、等待原因、存储访问和缓存峰值</td>
+</tr>
+<tr>
+<td>资源清单及综合模型</td>
+<td>宏实例、寄存器、计算逻辑及指定库</td>
+<td>宏面积精确汇总，标准单元面积逐步校准</td>
+</tr>
+</tbody>
+</table></div>
+<p>NumPy 或 PyTorch 的实际运行耗时不得作为硬件时延。Python 的任意精度整数也不能代替硬件溢出规则。硬件行为模型可以使用事件驱动加速执行，但其时间语义必须与逐周期模型一致。</p>
+<h2 id="2">2 固定工作负载与待确认条件</h2>
+<h3 id="21">2.1 模型基线</h3>
+<p>模型固定为 ARM keyword-transformer 仓库提交 <code>237e4097</code> 下的 KWT-1，使用已核验的 12 类模型配置与检查点。保持批大小 1、序列长度 99、隐藏维度 64、单注意力头、FFN 隐藏维度 256、编码器层数 12。原始参数是 FP32，INT8 等格式属于硬件方案，不能当作官方权重的原始格式。[1][2]</p>
+<p>编码器采用 PostNorm。两处 LN 都处理一个 token 的 64 个通道；256 维位于 FFN 内部，后接 GELU，不是 LN 的输入宽度。</p>
+<pre><code class="language-text">X ── Q K V 投影 ── QKᵀ ── 缩放和 Softmax ── AV ── 输出投影 ── 加 X ── LN1 ── H
+H ── FFN1 64→256 ── GELU ── FFN2 256→64 ── 加 H ── LN2 ── 下一层输入
+</code></pre>
+<p>统一用 GEMM 记号 <code>C[M,N] = A[M,R] × B[R,N]</code>。R 是归约维度，避免与注意力中的 K 矩阵混淆。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>算子</th>
+<th style="text-align: right;">M</th>
+<th style="text-align: right;">N</th>
+<th style="text-align: right;">R</th>
+<th>后续处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q 投影</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">64</td>
+<td>无偏置</td>
+</tr>
+<tr>
+<td>K 投影</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">64</td>
+<td>无偏置</td>
+</tr>
+<tr>
+<td>V 投影</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">64</td>
+<td>无偏置</td>
+</tr>
+<tr>
+<td>QKᵀ</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">64</td>
+<td>乘 1/8，沿 99 列做 Softmax</td>
+</tr>
+<tr>
+<td>AV</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">99</td>
+<td>注意力输出投影</td>
+</tr>
+<tr>
+<td>输出投影</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">64</td>
+<td>偏置、残差、64 维 LN</td>
+</tr>
+<tr>
+<td>FFN1</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">64</td>
+<td>偏置、GELU</td>
+</tr>
+<tr>
+<td>FFN2</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">256</td>
+<td>偏置、残差、64 维 LN</td>
+</tr>
+</tbody>
+</table></div>
+<p>每层上述矩阵运算含 6,120,576 次有效乘加，十二层合计 73,446,912 次。该计数不含非线性、残差、输入投影与分类头。报告必须声明性能边界，不能把编码器核心时间称为包含音频预处理的端到端时间。</p>
+<h3 id="22">2.2 赛事约束与参数状态</h3>
+<p>以下赛事条件来自当前提供的赛题摘录；正式实验应把相应赛题版本与平台包版本写入实验记录。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>当前约束或处理方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>新增面积上限</td>
+<td>2.25 mm²，包含加速器、接口逻辑与内部 SRAM 宏</td>
+</tr>
+<tr>
+<td>标准单元面积</td>
+<td>按指定库综合映射结果统计</td>
+</tr>
+<tr>
+<td>SRAM 宏面积</td>
+<td>按组委会提供的数据求和，不漏计、不重复计入</td>
+</tr>
+<tr>
+<td>不计入上述预算的既有模块</td>
+<td>E203、512 KB 共享 SRAM、固定总线和外设，单列报告</td>
+</tr>
+<tr>
+<td>内部 SRAM 可选宏</td>
+<td>16 bit×128、16 bit×1024、16 bit×4096，单端口或双端口</td>
+</tr>
+<tr>
+<td>512 KB 容量单位</td>
+<td>原型可按 512 KiB，即 524,288 字节；导入正式地址映射后以平台为准</td>
+</tr>
+<tr>
+<td>共享 SRAM 接口</td>
+<td>数据宽度、端口、读延迟、仲裁和突发能力均待平台确认</td>
+</tr>
+<tr>
+<td>双端口语义</td>
+<td>不能默认是 1R1W 或 2RW；需导入宏说明</td>
+</tr>
+<tr>
+<td>参考频率</td>
+<td>扫描阶段可用 150 MHz 作换算示例，不等于已达到综合频率</td>
+</tr>
+</tbody>
+</table></div>
+<p>未知平台参数保留为 <code>null</code> 或带来源的场景假设。不得把“内部宏每端口 16 bit”推导为“共享 SRAM 总宽度 16 bit”，也不得把 E203 的 LB/LH/LW 指令宽度当作共享存储端口规格。</p>
+<h2 id="3">3 公平比较规则</h2>
+<p>第一组实验在相同平台条件下比较两个具体方案：A 为 144 个乘法器的 9×16 阵列，B 为 128 个乘法器的逐行点积单元。明确数量不同，不把全部性能差异归因于数据流。</p>
+<p>第二组实验在相同面积上限和准确率要求下分别优化两种方案。允许各自调整内部缓存、分块和数据排列，但增加的 SRAM 宏、寄存器、转换逻辑与搬运流量必须计入。可额外提供相同乘法器数量的对照实验，用来隔离结构差异，但不替代实际候选比较。</p>
+<p>两者共用工作负载、参数值、量化规则、共享总线模型、LN 算法和启动完成边界。若要为某架构设计不同的 LN 单元，应作为另一组联合优化实验，不能与第一组混在一起。</p>
+<p>每次实验都声明初始驻留状态：参数是否已在共享 SRAM、内部缓存是否预热、是否包含当前层装载。冷启动、层间连续执行和稳态重复推理分别报告。没有数据驻留记录的“带宽充足”结果只作为计算上限。</p>
+<h2 id="4">4 软件组织与公共数据结构</h2>
+<p>建议首先用 Python 标准库建立逐周期参考内核，使用 <code>dataclasses</code>、<code>heapq</code>、<code>json</code>、<code>csv</code> 和测试框架。数值模型按需使用 NumPy 与既有 TensorFlow 模型。项目锁定实际使用的依赖版本。</p>
+<pre><code class="language-text">hw_model/
+  configs/       model.json platform.json arch_array.json arch_row.json
+  core/          clock.py events.py resources.py buffers.py metrics.py
+  memory/        shared.py banks.py layout.py dma.py
+  compute/       array_9x16.py row_dot128.py requant.py
+  nonlinear/     residual.py layernorm.py softmax.py gelu.py
+  schedule/      graph.py mapping.py lifetime.py
+  numerical/     reference.py quantization.py approximations.py
+  tests/         arithmetic/ memory/ scheduling/ integration/
+  experiments/   run.py sweep.py compare.py
+  reports/       每次运行独立目录
+</code></pre>
+<p>这是一套建议目录，不表示这些模块已在交付包中实现。两个计算后端共用 <code>memory</code>、<code>nonlinear</code>、<code>core</code>；差异集中在映射、发起条件、结果产生顺序和缓存需求。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>对象</th>
+<th>必须包含的字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TensorDesc</td>
+<td>tensor_id、shape、dtype、scale_id、layout、base_byte_addr、bytes、producer、consumers</td>
+</tr>
+<tr>
+<td>TileDesc</td>
+<td>tensor_id、M/N/R 范围、有效元素掩码、物理地址映射</td>
+</tr>
+<tr>
+<td>MemRequest</td>
+<td>request_id、请求者、读写、地址、有效字节、物理拍数、依赖、发起时刻</td>
+</tr>
+<tr>
+<td>ComputeIssue</td>
+<td>op_id、tile_id、操作数就绪标记、有效乘法数、完成事件、输出容量预留</td>
+</tr>
+<tr>
+<td>RowFragment</td>
+<td>layer、op、token、channel_start、有效通道数、dtype、scale_id、ready_cycle</td>
+</tr>
+<tr>
+<td>BufferAllocation</td>
+<td>owner、字节数、物理区域、预留状态、引用数、释放条件</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>cycle、phase、sequence_id、kind、payload</td>
+</tr>
+</tbody>
+</table></div>
+<p>系统地址统一用字节。内部 SRAM 另有 <code>bank_id</code>、<code>word_index</code> 和字节位置；不得把 16 bit 存储字索引直接用作字节地址。逻辑张量视图不隐含免费转置或免费数据复制。</p>
+<p>模块提供统一接口：<code>collect_intents(snapshot)</code> 生成请求，<code>resolve(intents)</code> 仲裁资源，<code>commit(grants)</code> 提交状态，<code>on_complete(event)</code> 处理已完成事件，<code>stats()</code> 返回计数器。</p>
+<h2 id="5">5 时间语义与仿真内核</h2>
+<h3 id="51">5.1 周期边界</h3>
+<p>一个周期按区间 <code>[t,t+1)</code> 定义。周期 t 接受的延迟 L 请求，在周期 <code>t+L</code> 开始处完成。同步 SRAM 读取默认 L≥1，不允许请求在发起瞬间返回数据。不同频率模块使用统一整数时间单位或显式时钟比，禁止直接混用周期数。</p>
+<p>每个周期按固定顺序执行：</p>
+<ol>
+<li>应用本周期开始时到期的完成事件，更新可见数据与已释放资源。</li>
+<li>从统一快照收集各模块意图，不在收集过程中修改共享状态。</li>
+<li>按固定仲裁规则分配端口、计算资源、FIFO 空位和返回数据容量。</li>
+<li>原子提交获准动作，安排未来完成事件。</li>
+<li>检查不变量，记录状态、利用率和等待原因，推进时间。</li>
+</ol>
+<p>这保证结果不依赖 Python 调用模块的先后顺序。同周期到期事件先完成，再允许消费者在该周期发起下一项操作；本周期新发起动作不能制造未定义的零周期反馈。</p>
+<pre><code class="language-python">while not simulator.done():
+    simulator.apply_completions_at(simulator.cycle)
+    snapshot = simulator.snapshot()
+    intents = []
+    for module in simulator.modules:
+        intents.extend(module.collect_intents(snapshot))
+    grants = simulator.arbiter.resolve(intents, snapshot)
+    simulator.commit(grants)
+    simulator.check_invariants()
+    simulator.record_cycle()
+    simulator.cycle += 1
+</code></pre>
+<p>上述代码表达执行顺序，具体类与返回类型由实现补齐。若数据未齐，计算单元不得部分扣取一组不可恢复的操作数；可分别预取各 bank 的数据进入有界 FIFO，待完整操作数包到齐后再发起计算。</p>
+<h3 id="52">5.2 事件驱动加速</h3>
+<p>先让逐周期版本在小尺寸上通过验证，再使用最小堆跳到下一个事件。事件键可采用 <code>(cycle, phase, sequence_id)</code>，保留确定性的同周期仲裁。只有当中间周期没有可发起动作或状态变化时才能跳过，不能跳过本来可以利用的总线拍或 FIFO 空位。</p>
+<p>SimPy 可作为事件队列与进程组织工具，但其同时间事件仍按确定顺序依次处理；必须自行实现硬件的请求收集和原子仲裁语义，不能依靠进程创建顺序模拟并行端口。[3]</p>
+<h2 id="6">6 存储与搬运模型</h2>
+<h3 id="61-sram">6.1 共享 SRAM 与接口</h3>
+<p>至少建模容量、数据拍宽度、请求接受间隔、返回延迟、最大未完成请求数、读写是否共用通道、突发长度、仲裁策略和其他主设备流量。<code>峰值 B/周期 × 效率</code> 只能用于第一轮敏感性扫描，正式模型要由请求和响应计算实际吞吐量。</p>
+<p>容量访问检查包括地址越界、活跃张量覆盖、按需对齐和有效字节掩码。DMA、CPU 或其他主设备通过同一仲裁器申请已有资源；不能让各模块分别获得一份完整共享带宽。</p>
+<p>定义接口层级：参数源 → 共享 SRAM、共享 SRAM → 局部缓冲、局部缓冲 → 计算寄存器、结果回写。每一级分别记录字节与事务数。既有 SRAM 面积免计不意味着访问零延迟、无竞争或免费能耗。</p>
+<h3 id="62-sram-bank">6.2 SRAM bank 与宏实例</h3>
+<p>每个 bank 明确宏类型、深度、16 bit 字宽、端口角色、延迟、写掩码和同地址冲突规则。单端口宏每周期最多执行一个读或写。1R1W 与真正双读写端口分别实现；宏未说明的行为按不可用处理，不能默认支持两个并行读取。</p>
+<p>对每次请求先进行地址到 bank 的映射，再仲裁。银行数足够并不意味着任意访问都无冲突。转置、分 bank 打包、尾部补齐与 DMA 解包的吞吐和空间都要计入。</p>
+<p>9×16 阵列的 INT8 满载映射每周期需要 9 个 A 和 16 个 B 元素。一个可行的局部布局是：</p>
+<pre><code class="language-text">A bank p, word k = {A[2p,k], A[2p+1,k]}，p=0..4，最后一个位置填充
+B bank q, word k = {B[k,2q], B[k,2q+1]}，q=0..7
+</code></pre>
+<p>五个 A bank 与八个 B bank 同时读，可提供 26 字节，其中 25 字节有效。选用最小宏时，13×256 B＝3,328 B；若用两套单端口 bank 实现完全分离的读写乒乓，则是 26 个宏、6,656 B。双端口能否以一套 bank 存放两组数据取决于宏端口和地址安排。这些是可行布局示例，不是唯一实现或已经通过面积约束的结果。</p>
+<p>逐行方案在两个 64 维点积模式下，若一整行 A 已保存在寄存器，每周期仍需 128 个新的 B 元素。若全部从 16 bit 单读口宏直接提供，则要 64 路并行读取；也可用其他缓存和寄存器组织，但其面积与填充成本不能省略。若 AV 概率为 INT16，操作数位宽、读流量和乘法器支持方式必须另算。</p>
+<h3 id="63">6.3 有限缓冲和反压</h3>
+<p>400 bit 输入寄存器仅容纳两组 200 bit 操作数，不是完整 tile 缓存。模型必须记录填充、消费和有效位，不能每周期隐式补满。</p>
+<p>所有缓冲的生命周期为 <code>FREE → RESERVED → FILLING → READY → IN_USE → FREE</code>。结果在飞行途中也占用预留容量，避免多个生产者承诺同一空间。缓冲满时前级停止发起，或进入明确的结果保持状态；保持结果占用的寄存器也应计入。</p>
+<p>输出容量可在发起时预留，也可允许结果先留在累加器中等待排空，两种策略必须明确区分。不能因为输出 FIFO 满，就让尚未完成的计算丢失；也不能把整个九行结果原子写入容量只有一行的队列。</p>
+<p>张量仅在最后一个消费者完成读取后释放。残差输入在加法消费完成前不能被覆盖。保留权重块遍历 token 与逐行完成全部输出是不同循环顺序，切换策略时同步更新活跃部分和数量及 LN 前缓存需求。</p>
+<h3 id="64">6.4 容量与访问量分开统计</h3>
+<p>对于输入 INT8、LN 前 INT16 的直接分组调度，以下是有效数据工作集，不是物理宏容量下限：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>数据</th>
+<th style="text-align: right;">阵列同时处理九行</th>
+<th style="text-align: right;">逐行处理一行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输出投影输入 64 维</td>
+<td style="text-align: right;">576 B</td>
+<td style="text-align: right;">64 B</td>
+</tr>
+<tr>
+<td>FFN2 输入 256 维</td>
+<td style="text-align: right;">2,304 B</td>
+<td style="text-align: right;">256 B</td>
+</tr>
+<tr>
+<td>LN 前 64 维结果</td>
+<td style="text-align: right;">1,152 B</td>
+<td style="text-align: right;">128 B</td>
+</tr>
+</tbody>
+</table></div>
+<p>表中不含乒乓、残差、权重、LN 内部工作区及部分和。改变分块或流式输出后，实际驻留量可能变化，应由张量生命周期统计，而非把“九倍”写成固定硬件定律。</p>
+<h2 id="7">7 两个计算后端的实现</h2>
+<h3 id="71-a-916">7.1 后端 A 为 9×16 输出驻留阵列</h3>
+<p>每个 PE 含一个乘法器和累加寄存器。行广播 A，列广播 B。仅当本周期所需操作数包完整、累加依赖满足且资源可用时发起一次更新。有效乘法数等于有效行数乘有效列数；尾块无效 PE 不增加有效 MAC 计数。</p>
+<p>典型循环为 <code>token_group → output_channel_group → reduction_chunk → reduction_index</code>。输出通道块完整后必须排空、转换或转存其结果，再复用累加寄存器。可替换循环顺序测试权重驻留，但不能在保持九行完成时间不变的同时，隐式获得跨全部 token 的权重复用。</p>
+<p>偏置在每个输出第一次初始化时加入，归约分块续算不得再次添加。对称 INT8 方案下，累加位宽可先设为 INT32，但模型必须允许更改并验证溢出。乘法流水线延迟与累加反馈间隔分别配置；多周期反馈不能自动假设每周期更新同一个累加器。</p>
+<p>在操作数无限供应、无反馈停顿、无排空和流水线开销时：</p>
+<pre><code class="language-text">T_array_issue = ceil(M/9) × ceil(N/16) × R
+</code></pre>
+<p>该式是算术发起基准，不是完整硬件周期。输出投影需要四个通道块完成后，一行才具备全部 64 个通道；第一块 16 通道就绪不等于可以完成 LN。</p>
+<h3 id="72-b-128">7.2 后端 B 为逐行 128 乘法器和可重构加法树</h3>
+<p>默认一个 token 一次推进两个输出通道，每个通道并行处理 64 个归约元素。A 行驻留在寄存器或缓存，B 按输出列所需顺序提供。每个完整 64 维点积经过乘法及归约流水线后产生一个输出。</p>
+<p>典型循环为 <code>token → output_channel_pair → reduction_chunk</code>。R=64 时每个输出对一次发起；R=256 时每个输出对四次发起并累加部分和。缓存和队列按最多两个输出的结果片段组织。</p>
+<pre><code class="language-text">T_row_issue = M × ceil(N/2) × ceil(R/64)
+</code></pre>
+<p>这是一种确定映射。不能不加说明地把 <code>ceil(M×N×R/128)</code> 当成所有形状下都能达到的周期数。</p>
+<p>对于 AV 的 R=99，可增加第二种映射：64 个输出通道各用两个乘法器与两路加法树，每周期处理两个 token 位置，50 次发起完成一行。该模式需要 64 个累加状态、输出通路及相应数据布局。若没有实现这个模式，就按原来的映射统计，不能借用优化后的周期数。</p>
+<p>加法树的分组切换、流水寄存器、归约延迟、部分和反馈、取数选通均进入配置或资源模型。SpAtten 的可重构归约是设计参考，不能直接套用它在不同存储系统上的吞吐或能耗结果。[4]</p>
+<h3 id="73">7.3 供数约束</h3>
+<p>每个输出投影权重矩阵有 4,096 个 INT8 元素；FFN2 有 16,384 个。若没有跨行 B 缓存，逐行方案每个 token 都读取一遍。16 B/周期的 B 供数下，单行下界分别为 256 与 1,024 周期，不能继续使用 32 与 128 周期的纯计算结果。</p>
+<p>如果 B 已驻留在更宽的内部缓存，上述限制发生在内部缓存首次填充，而非每个 token；模型用真实驻留状态决定。每次报告明确“16 B/周期”指哪一级通路，以及是否与激活、输出共用。</p>
+<h2 id="8-ln">8 残差与 LN 融合模型</h2>
+<h3 id="81">8.1 行结果的生命周期</h3>
+<p>矩阵后端产生带 token 和通道编号的片段。<code>RowAssembler</code> 按行维护 64 位通道有效掩码，在接收第一个片段时申请存储，并检查重复或遗漏通道。</p>
+<p>每个通道需先完成指定的偏置、缩放、残差对齐与加法，才能成为 LN 输入。残差未返回时，即使矩阵结果已就绪，也不能把该通道计入 LN 的有效统计。</p>
+<p>建议定义这些事件：</p>
+<pre><code class="language-text">MAT_FRAGMENT_READY → RESIDUAL_OPERANDS_READY → LN_INPUT_FRAGMENT_READY
+→ ROW_COMPLETE → LN_ACCEPT → LN_STATS_READY → LN_OUTPUT_FRAGMENT → LN_ROW_DONE
+</code></pre>
+<p>允许在 LN 输入片段陆续到达时累计统计量，但最终均值和方差必须等 64 个通道完整。输出阶段仍需原始 LN 输入或等价中间值，不能因统计已完成就提前释放数据。存储释放时刻是最后一次读取真正完成，而不是最后一个请求刚发出。</p>
+<h3 id="82">8.2 功能公式与定点边界</h3>
+<pre><code class="language-text">mu = sum(x[j], j=0..63) / 64
+var = sum((x[j] - mu)^2, j=0..63) / 64
+y[j] = gamma[j] × (x[j] - mu) / sqrt(var + epsilon) + beta[j]
+epsilon = 1e-6，按参考模型的实数尺度定义
+</code></pre>
+<p>可采用平方和形式计算方差以便流式累计，但有限精度下它不必与两遍减均值形式完全相同，必须由数值模型验证。记录求和、平方、方差、倒平方根、gamma/beta 的格式与舍入位置。</p>
+<p>不同输出通道若使用不同缩放尺度，不能直接对原始量化整数求均值。先对齐到公共 LN 输入尺度，或明确实现等价的带尺度统计。残差两支也必须对齐尺度。<code>epsilon</code> 不能直接以无单位整数 1 替代；负方差修正、零方差路径和饱和规则需明确。</p>
+<h3 id="83-ln">8.3 两级 LN 时序模型</h3>
+<p><strong>L0 行级模型</strong>用于初筛，配置 <code>latency_cycles</code>、<code>initiation_interval_cycles</code> 和 <code>max_inflight_rows</code>。同时满足资源、数据和输出容量条件时才能接收一行。延迟是接收到完成的时间，接收间隔是相邻行允许启动的最小间隔，二者不是同一参数。</p>
+<p><strong>L1 分阶段模型</strong>用于最终候选比较，将 LN 拆成输入与统计、均值方差、倒平方根、重读与仿射输出。配置各阶段通道吞吐、延迟、共享乘法器/查表端口、gamma/beta 读取和缓冲容量。各阶段延迟不能简单相加后又额外叠加一次行级延迟，以免重复计时。</p>
+<p>如果均值阶段与矩阵结果输出重叠，事件表必须说明统计从哪个片段开始。若 gamma/beta 常驻寄存器，只计首次装载及寄存器面积；若存 SRAM，逐次访问仍受端口限制。</p>
+<h3 id="84">8.4 首行与整层的指标</h3>
+<p>至少记录首个矩阵片段、首行完整矩阵结果、首行完整 LN 输入、LN 接收首行、LN 首个输出及 LN 最后一行完成时刻。首行优势是否能转化为整层收益，取决于 LN 接收间隔、矩阵行产生速率和有限缓冲。</p>
+<p>同一个矩阵引擎不能同时执行输出投影和 FFN2，也不能免费同时执行 FFN1 与 FFN2。矩阵与独立 LN 单元可以重叠，但需要资源与数据依赖实际允许。非流式 KWS 仍然允许一次样本推理内部的算子流水。</p>
+<h2 id="9">9 扩展到完整模型</h2>
+<p>第一阶段融合子图通过后，再加入 QKV、QKᵀ、Softmax、AV、FFN1 和 GELU，并保持完整依赖图。下一层 QKᵀ 对全部 K 的依赖会限制跨层逐行推进，不能把两个融合子图的首行优势直接外推为十二层都能完全流水。</p>
+<p>Softmax 的行宽为 99，不是 64。稳定实现通常包含行最大值、指数、归约求和、归一化等阶段；各遍读取、指数临时值保留、除法吞吐和缓存都应建模。若使用在线算法或重计算减少缓存，要单独验证数值等价与工作量变化。</p>
+<p>GELU 是逐元素算子，可与 FFN1 的结果片段衔接，但需要描述近似方法、接收间隔和输出格式。复用 LN 或 Softmax 的算术资源时，通过同一资源对象仲裁，不得同时假设各自独占全部资源。</p>
+<p>输入投影、位置编码与分类头是否在硬件、CPU 或比较边界之外，由正式任务划分确定。端到端报告必须包含实际属于测量边界的工作，不把不同边界的数字放在同一排名中。</p>
+<h2 id="10">10 配置模板与实验来源记录</h2>
+<p>建议配置使用 JSON，未知参数为 <code>null</code>；正式运行遇到影响结果的未知参数必须拒绝执行。敏感性实验另用带名称的场景覆盖，允许假设但明确标记，不能静默使用默认值。</p>
+<p>以下是结构模板，描述配置字段，并非一份开箱即跑的配置：</p>
+<pre><code class="language-json">{
+  "schema_version": 1,
+  "model": {"tokens": 99, "hidden": 64, "ffn": 256, "layers": 12},
+  "scope": "projection_residual_ln",
+  "numeric": {
+    "activation_bits": 8, "weight_bits": 8, "accumulator_bits": 32,
+    "pre_ln_bits": 16, "softmax_output_bits": null,
+    "rounding": "nearest_even", "overflow": "saturate"
+  },
+  "platform": {
+    "shared_bytes": 524288,
+    "bus_data_bits": null, "bus_read_latency": null,
+    "bus_accept_interval": null, "max_outstanding": null,
+    "read_write_shared": null, "clock_hz": null
+  },
+  "architecture": {
+    "kind": "array_9x16", "output_mapping": "token_group_first",
+    "reduction_chunk": 32, "result_storage_bytes": null
+  },
+  "ln": {
+    "model_level": "row",
+    "latency_cycles": null, "initiation_interval_cycles": null,
+    "max_inflight_rows": null, "epsilon": 0.000001
+  },
+  "provenance": {
+    "model_commit": "237e4097", "platform_revision": null,
+    "calibration_id": null, "scenario_id": null
+  }
+}
+</code></pre>
+<p>数据格式字段只是候选定义，不代表已完成精度验证。若中间激活使用 INT16，输入带宽和算术硬件也随之变化；不可保持 INT8 的面积与供数数字不变。</p>
+<p>每次运行保存完整合并后的配置、软件提交或源码哈希、随机种子、模型与检查点标识、工作负载尺寸、平台来源、量化配置和明确的初始驻留状态。复制配置生成新实验，不覆盖旧结果。</p>
+<h2 id="11_1">11 指标与报告格式</h2>
+<p>输出至少包含 <code>run_config.json</code>、<code>summary.json</code>、<code>operators.csv</code>、<code>memory.csv</code>、<code>buffers.csv</code>、<code>trace.jsonl</code> 和 <code>assumptions.md</code>。这些文件是待实现仿真器的输出约定。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>total_cycles</td>
+<td>规定开始事件到最后有效输出完成，包括排空</td>
+</tr>
+<tr>
+<td>first_row_cycles</td>
+<td>指定融合边界内首行完整输出的时刻</td>
+</tr>
+<tr>
+<td>useful_mac</td>
+<td>真实有效乘加数，排除尾块填充</td>
+</tr>
+<tr>
+<td>compute_utilization</td>
+<td>useful_mac ÷（物理乘法器数 × 比较窗口周期数）</td>
+</tr>
+<tr>
+<td>shared_read/write_bytes</td>
+<td>共享 SRAM 接口实际传输量，读写分别统计</td>
+</tr>
+<tr>
+<td>bank_read/write_ops</td>
+<td>每个内部宏的读写操作次数</td>
+</tr>
+<tr>
+<td>useful/physical_bytes</td>
+<td>有效数据和含填充、对齐的物理传输量分别记录</td>
+</tr>
+<tr>
+<td>peak_reserved/live_bytes</td>
+<td>在飞行预留和实际活跃存储的峰值</td>
+</tr>
+<tr>
+<td>stalls</td>
+<td>输入未齐、bank 冲突、总线等待、输出满、累加依赖等</td>
+</tr>
+<tr>
+<td>area_status</td>
+<td>宏已知面积、标准单元估计或综合结果、未知项目</td>
+</tr>
+</tbody>
+</table></div>
+<p>阻塞原因可能同时存在。保留原因位集合，并为汇总定义固定的主要原因优先级，使“主要阻塞周期”不会重复相加超过总周期。独立模块的忙碌周期也不能直接相加作为端到端时间。</p>
+<p>时间线应显示 DMA、矩阵、残差、LN 各阶段及缓冲占用。统计表旁展示总时延随带宽、LN 接收间隔和缓存容量的变化，找出两种方案排名发生变化的条件。</p>
+<h2 id="12_1">12 算术与调度基准</h2>
+<h3 id="121">12.1 无存储限制的计算发起周期</h3>
+<p>配置为 INT8、每周期 144 或 128 次乘法、无流水线与排空开销，得到以下可手算基准。QKV 分别计算；AV 的逐行方案启用 64 组两路归约模式。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>运算</th>
+<th style="text-align: right;">9×16 阵列</th>
+<th style="text-align: right;">逐行 128 乘法器</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QKV 三个投影</td>
+<td style="text-align: right;">8,448</td>
+<td style="text-align: right;">9,504</td>
+</tr>
+<tr>
+<td>QKᵀ</td>
+<td style="text-align: right;">4,928</td>
+<td style="text-align: right;">4,950</td>
+</tr>
+<tr>
+<td>AV</td>
+<td style="text-align: right;">4,356</td>
+<td style="text-align: right;">4,950</td>
+</tr>
+<tr>
+<td>输出投影</td>
+<td style="text-align: right;">2,816</td>
+<td style="text-align: right;">3,168</td>
+</tr>
+<tr>
+<td>FFN1</td>
+<td style="text-align: right;">11,264</td>
+<td style="text-align: right;">12,672</td>
+</tr>
+<tr>
+<td>FFN2</td>
+<td style="text-align: right;">11,264</td>
+<td style="text-align: right;">12,672</td>
+</tr>
+<tr>
+<td>每层合计</td>
+<td style="text-align: right;">43,076</td>
+<td style="text-align: right;">47,916</td>
+</tr>
+</tbody>
+</table></div>
+<p>第一行完整矩阵结果：输出投影为 256 对 32 周期，FFN2 为 1,024 对 128 周期。阵列在该时刻完成九行，逐行方案完成一行。不能据此宣称整体吞吐量相差八倍。</p>
+<h3 id="122-ln">12.2 行级 LN 的人工检查样例</h3>
+<p>仅为调度单元测试，设 LN 延迟与接收间隔均为 64 周期，单行执行，输入缓存无限，无残差与结果搬运开销。阵列每批九行同时就绪，逐行单元依次产生行。</p>
+<p>对第 i 行，矩阵就绪时刻为 a[i]，LN 完成时刻为 f[i]：</p>
+<pre><code class="language-text">f[-1] = 0
+f[i] = max(a[i], f[i-1]) + 64
+</code></pre>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>子图</th>
+<th>架构</th>
+<th style="text-align: right;">全部 99 行完成 LN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输出投影加 LN</td>
+<td>阵列</td>
+<td style="text-align: right;">6,592 周期</td>
+</tr>
+<tr>
+<td>输出投影加 LN</td>
+<td>逐行</td>
+<td style="text-align: right;">6,368 周期</td>
+</tr>
+<tr>
+<td>FFN2 加 LN</td>
+<td>阵列</td>
+<td style="text-align: right;">11,840 周期</td>
+</tr>
+<tr>
+<td>FFN2 加 LN</td>
+<td>逐行</td>
+<td style="text-align: right;">12,736 周期</td>
+</tr>
+</tbody>
+</table></div>
+<p>这个基准用于检验调度器，不用于最终架构排名。有限缓存、端口冲突、部分和排空、残差和实际 LN 流水线必须在详细模型中重新计算。L0 的无限缓存模式必须显式命名并禁止混入正式结果。</p>
+<h3 id="123">12.3 边界与资源测试</h3>
+<p>必须覆盖：M 为 1、8、9、10、99；N 为 1、15、16、17、64、99、256；R 为 1、31、32、33、64、99、256。关注最后一块掩码、INT8 奇数元素打包、跨地址边界、归约续算只加一次偏置。</p>
+<p>资源测试包括：单端口同周期读写拒绝、两请求映射同 bank、输出缓冲仅一行、LN 停顿、残差晚到、DMA 未完成数受限、读写共享总线、双缓冲切换和最后一块排空。测试要验证独立的计算结果和资源约束，不只是重复实现中的公式。</p>
+<h2 id="13-rtl">13 数值验证与 RTL 对接</h2>
+<p>数值验证先建立浮点基线，再按赛事规定从训练划分取样标定；验证划分用于功能调试和准确率验证。标定用于确定量化尺度等参数，不等于在验证集上重新训练。</p>
+<p>使用高精度参考计算检查小矩阵，再显式模拟定点缩放、舍入、截断、溢出和非线性近似。整数累加在足够宽且中间不舍入的情况下可以改变求和顺序；若树内逐级截断或使用浮点，顺序变化可能影响结果。</p>
+<p>性能模型的事件与数值模型通过 tensor_id、token、channel 和 tile_id 对齐。小尺寸联调可携带真实数据；大规模扫描可只携带元数据。数据相关分支或稀疏优化必须由真实数据或明确工作负载轨迹驱动，不能凭空给予跳过收益。</p>
+<p>候选收敛后，只为关键差异模块实现小规模 RTL：计算后端、bank 与接口控制、LN 输入输出与行缓存。向软件与 RTL 注入相同的请求、数据和背压轨迹，比较接受事件、输出值、输出时刻和逐级读写次数。</p>
+<p>若软件尚未精确建模某个流水线阶段，可先允许已解释的固定延迟偏差，再逐项收敛；不得用一个任意修正系数掩盖带宽、缓冲或调度错误。</p>
+<h2 id="14">14 面积与能耗处理</h2>
+<p>新增面积计算为：</p>
+<pre><code class="language-text">A_new = A_standard_cells + sum(instance_count[type] × macro_area[type])
+</code></pre>
+<p>标准单元包括计算、寄存器、接口、FIFO 控制、地址生成、重排和转换逻辑。新增 SRAM 宏按实际实例统计，不因映射到共享地址空间而免计。既有 E203、共享 SRAM 与固定总线外设单列。</p>
+<p>宏类型与数量确定、官方面积已导入时，可准确汇总该部分。宏面积未知时输出 <code>unknown</code>，不能设为零。综合报告如果已包含宏黑盒面积，需要明确剔除或避免二次计入。把多余有效存储映射到宏后，按整个宏面积计费。</p>
+<p>早期可用小模块综合得到乘法器、累加器、加法树和控制的估计区间，但不能仅按乘法器数量线性推导整个加速器面积。两种架构的工作频率可能不同，应同时报告等频周期比较和综合可达频率下的时间比较。</p>
+<p>能耗只有在具备对应工艺、宏和位宽的操作能耗或活动率数据时才汇总；否则报告访问量和活动次数，不把“读命令少”直接等同于“功耗更低”。</p>
+<h2 id="15">15 实验顺序与停止条件</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>实现内容</th>
+<th>进入下一阶段的条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>算子尺寸与两个纯计算映射</td>
+<td>第 12 节周期和有效 MAC 全部匹配</td>
+</tr>
+<tr>
+<td>B</td>
+<td>行级残差 LN 调度</td>
+<td>首行和末行基准匹配，事件顺序确定</td>
+</tr>
+<tr>
+<td>C</td>
+<td>有限缓存和真实 bank 请求</td>
+<td>无越界、覆盖、端口超用或数据丢失</td>
+</tr>
+<tr>
+<td>D</td>
+<td>共享接口与 DMA</td>
+<td>请求响应可追踪，带宽账本闭合</td>
+</tr>
+<tr>
+<td>E</td>
+<td>LN 分阶段与数值模型</td>
+<td>位宽、读写和数值结果均可解释</td>
+</tr>
+<tr>
+<td>F</td>
+<td>完整编码器及十二层</td>
+<td>全依赖图、层间搬运、参数装载纳入</td>
+</tr>
+<tr>
+<td>G</td>
+<td>小 RTL 校准与方案筛选</td>
+<td>关键时序及面积有综合或仿真依据</td>
+</tr>
+</tbody>
+</table></div>
+<p>先做小范围单变量扫描，再围绕排名变化的区域联合优化，不必一开始跑全组合。带宽扫描可用 4、8、16、32、64、128 B/周期等假设值，但必须注明属于哪一级通路，不能把不可实现的值标为平台能力。</p>
+<p>LN 扫描分别改变通道并行度、接收间隔与阶段延迟；缓存扫描以真实宏组合为单位，同时记录有效容量和物理容量。400 bit 寄存器方案可作为一个输入级候选，不自动代替整个权重和激活缓存。</p>
+<p>当一种方案在准确率、实际可实现面积与目标性能下被另一种方案全面超过，可以停止继续优化它。若结果依赖尚未确认的总线或宏参数，保留条件性结论，优先获取能够改变选型的那一个平台参数。</p>
+<h2 id="16">16 完成检查表</h2>
+<ul>
+<li>两种后端处理同样的 99 个 token，输出元素总数正确，尾块不重复或遗漏。</li>
+<li>两处 LN 均为 64 维，Softmax 为 99 维，FFN 中间 256 维不混用。</li>
+<li>每个计算事件都能追溯到已就绪的操作数；没有免费转置、免费缓存填充或无限返回队列。</li>
+<li>总线拍和宏端口没有超额分配；数据流中每次物理传输有唯一计费位置。</li>
+<li>行缓存、权重、残差和部分和都计入驻留空间；在飞行输出已预留容量。</li>
+<li>缓存不足可以造成停顿，但不改变正确结果；死锁时输出等待链和持有资源。</li>
+<li>LN 延迟、接收间隔与缓存占用独立描述；首行与整层时间分别输出。</li>
+<li>原始数值误差与硬件性能指标分开；没有用 Python 执行耗时作为硬件性能。</li>
+<li>SRAM 面积使用官方实例数据；未知标准单元面积未被伪装成已通过面积约束。</li>
+<li>结果带配置、来源和初始状态，可重复运行；L0 假设结果与 L1 详细结果有清晰标识。</li>
+</ul>
+<h2 id="17">17 参考依据</h2>
+<ol>
+<li><a href="https://github.com/ARM-software/keyword-transformer/blob/237e4097/kws_streaming/models/transformer_utils.py">ARM keyword-transformer 模型实现 固定提交 237e4097</a>。用于核对 PostNorm、残差、无偏置 QKV、FFN 顺序与 LN 参数。</li>
+<li><a href="https://github.com/ARM-software/keyword-transformer/blob/237e4097/models_data_v2_12_labels/kwt1/flags.json">KWT-1 配置 固定提交 237e4097</a>。结合检查点形状确定本项目基线；不同仓库版本或检查点需重新核验。</li>
+<li><a href="https://simpy.readthedocs.io/en/latest/topical_guides/time_and_scheduling.html">SimPy Time and Scheduling</a>。用于理解确定性事件调度；本文的硬件两阶段请求仲裁是项目设计约定。</li>
+<li><a href="https://arxiv.org/html/2012.09852v3">SpAtten 第 IV 节</a>。作为乘法器组与可重构归约的数据流参考，不作为本 SoC 性能或面积的直接依据。</li>
+<li>本次讨论提供的赛事摘录：2.25 mm² 新增面积约束、512 KB 既有共享 SRAM、指定 16 bit SRAM 宏、面积统计方法。正式实现时应归档完整赛题、宏面积表、端口说明与 SoC 接口文档。</li>
+</ol></main></div></body></html>

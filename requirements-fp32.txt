@@ -1,0 +1,11 @@
+# Compatibility environment for Windows x64 / CPython 3.8.
+# Upstream requested tensorflow==2.4.0rc1, no longer listed on PyPI.
+# 2.4.0 is a documented compatibility choice, not the original rc1 runtime.
+tensorflow==2.4.0
+tensorflow-addons==0.12.1
+numpy==1.19.5
+protobuf==3.20.3
+typeguard==2.13.3
+tensorboard==2.4.1
+tensorflow-estimator==2.4.0
+absl-py==0.10.0

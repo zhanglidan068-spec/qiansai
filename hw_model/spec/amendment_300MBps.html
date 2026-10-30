@@ -1,0 +1,289 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KWT 硬件行为模型修改条款 固定 300 MB每秒</title><style>
+:root{--ink:#20252b;--muted:#626c78;--line:#d7dfe7;--accent:#17628d;--paper:#fff;--back:#f3f5f7}
+*{box-sizing:border-box}html{scroll-padding-top:22px}
+body{margin:0;background:var(--back);color:var(--ink);font:16px/1.85 'Microsoft YaHei','PingFang SC',sans-serif}
+.layout{max-width:1460px;margin:auto;display:grid;grid-template-columns:270px minmax(0,1fr);gap:30px;padding:32px}
+nav{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow:auto;font-size:13px;line-height:1.65;padding:8px 16px 24px 0}
+.navtitle{font-size:15px;font-weight:700;color:#000;margin-bottom:15px}
+nav ul{list-style:none;padding:0;margin:0}nav li{margin:0 0 9px}nav a{color:#394652;text-decoration:none}
+nav a:hover{color:var(--accent);text-decoration:underline}
+main{min-width:0;background:var(--paper);padding:42px 48px 65px;border:1px solid #e4e8ed;border-radius:8px}
+h1,h2,h3{color:#000;line-height:1.4;letter-spacing:0}
+h1{font-size:30px;margin:0 0 24px}h2{font-size:24px;margin:48px 0 18px}h3{font-size:19px;margin:29px 0 12px}
+p{margin:12px 0 16px}li{margin:7px 0}ul,ol{padding-left:25px}
+strong{font-weight:700}a{color:var(--accent);overflow-wrap:anywhere}
+code{font:0.9em/1.65 Consolas,'Microsoft YaHei',monospace;background:#f0f3f5;padding:2px 5px;border-radius:3px;overflow-wrap:anywhere}
+pre{background:#f3f6f8;padding:18px 20px;border:1px solid #e0e6ec;border-radius:5px;overflow:auto;line-height:1.65}
+pre code{background:none;padding:0;white-space:pre;overflow-wrap:normal;font-size:13px}
+.table-wrap{overflow:auto;margin:20px 0 24px}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.65}
+th,td{border:1px solid #d9d9d9;padding:11px 12px;text-align:left;vertical-align:middle;min-width:65px}
+th{background:#e8eff4;color:#000;font-weight:700}tbody tr:nth-child(even){background:#fafbfd}
+.meta{font-size:12px;color:var(--muted);margin:28px 0 0}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:16px;gap:12px}nav{position:static;max-height:240px;padding:12px}main{padding:28px 24px}h1{font-size:27px}}
+@media print{body{background:white;font-size:10.5pt;line-height:1.6}.layout{display:block;padding:0}nav{display:none}main{padding:0;border:0}h1{font-size:21pt}h2{font-size:16pt;break-after:avoid}h3{font-size:12pt;break-after:avoid}table{font-size:9pt}thead{display:table-header-group}tr{break-inside:avoid}pre{white-space:pre-wrap;overflow:visible}pre code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:8.5pt}.table-wrap{overflow:visible}a{color:inherit;text-decoration:none}@page{size:A4;margin:18mm}}
+</style></head>
+<body><div class="layout"><nav aria-label="修改条款目录"><div class="navtitle">固定权重带宽的修改条款</div><div class="toc">
+<ul>
+<li><a href="#1">1 替换实验条件和比较边界</a></li>
+<li><a href="#2">2 替换存储和供数模型</a></li>
+<li><a href="#3">3 替换两种计算单元的基线调度</a></li>
+<li><a href="#4-token">4 新增小权重缓存的跨 token 调度</a></li>
+<li><a href="#5-ln">5 替换 LN 和后处理约定</a></li>
+<li><a href="#6">6 替换算术检查样例</a></li>
+<li><a href="#7">7 替换输出指标和验收要求</a></li>
+<li><a href="#8">8 对原文的删除与保留范围</a></li>
+</ul>
+</div>
+
+<p class="meta">2026-10-29<br>仅列修改部分</p></nav><main><h1 id="kwt">KWT 硬件行为模型修改条款</h1>
+<p>日期 2026 年 10 月 29 日</p>
+<p>本文仅列出对原技术文档的修改。原文与本文冲突时，以本文为准；未涉及的数值验证、事件仲裁、地址检查和 RTL 对接方法沿用原文。本次固定权重通路为 300 MB/s，不再扫描其他系统带宽，不以多 bank 权重 SRAM 代替用户提出的小权重寄存器组。</p>
+<h2 id="1">1 替换实验条件和比较边界</h2>
+<p>两个计算单元保持为：A，9×16 输出驻留 PE 阵列，144 个乘法器；B，128 个乘法器与可重构加法树。采用 INT8 权重、INT8 矩阵输入、INT32 累加、INT16 残差合并后 LN 输入。LN 输出暂设为 INT8，输出量化包含在 LN 处理边界中；这些格式仍需独立数值验证。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>本次固定设置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>模型与比较子图</td>
+<td>99 个 token；输出投影 64→64；FFN2 256→64；均接偏置、残差、64 维 LN</td>
+</tr>
+<tr>
+<td>时钟</td>
+<td>150 MHz，作为本轮模型时钟假设</td>
+</tr>
+<tr>
+<td>权重位置</td>
+<td>512 KiB 共享 SRAM；两方案都通过同一抽象权重端口读取</td>
+</tr>
+<tr>
+<td>权重有效带宽</td>
+<td>300 MB/s，MB 为十进制，等效 2 B/周期</td>
+</tr>
+<tr>
+<td>激活位置</td>
+<td>加速器内部存储，包括当前输入、残差及本子图中间结果</td>
+</tr>
+<tr>
+<td>权重片上存储</td>
+<td>仅小寄存器组，不启用 whole_matrix 权重 SRAM</td>
+</tr>
+<tr>
+<td>LN</td>
+<td>串行行级单元，延迟 128 周期，启动间隔 128 周期，同时处理一行</td>
+</tr>
+<tr>
+<td>输出终点</td>
+<td>最后一行 LN 结果写入加速器内部输出缓冲，并收到确认</td>
+</tr>
+<tr>
+<td>不再计入主结果</td>
+<td>最后一行写回共享 SRAM；测试开始前的激活首次装入</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>主测量窗口从第一次权重请求开始，至内部 LN 输出完成。</strong> 输入激活、残差和本子图的 bias/gamma/beta 已就绪，权重寄存器为空。激活初装与参数初始化单独报告，不能隐藏后再称为系统冷启动时间。扩展为多层时，中间激活在内部生产和消费；发生容量不足而外溢到共享 SRAM 的候选违反本轮驻留假设，应标为不可行，不能悄悄增加外部激活访问。</p>
+<p>不改成两条各有 300 MB/s 的读写通路。本次 300 MB/s 专门建模权重读取；若以后把其他业务加入同一真实总线，必须重新分配带宽，但不属于这次比较。</p>
+<h2 id="2">2 替换存储和供数模型</h2>
+<h3 id="21">2.1 固定权重端口</h3>
+<p>采用 4 B 数据拍、每两个周期接受一次请求、3 周期响应延迟、最多两个未完成请求。约定允许一个请求返回的同周期接受新请求。连续对齐读取的稳态有效带宽为 300 MB/s，首尾延迟由事件模型记录，不再额外乘一个不明效率系数。</p>
+<p>256 bit、1024 bit 等寄存器输出宽度不改变该端口的填充速度。128 B 权重需要 32 个数据拍，稳态传输占用 64 周期；16 B 权重需要四拍，稳态占用八周期。首次请求到最后一拍返回还包含响应首尾，不直接把上述等效时间当成精确事务延迟。</p>
+<p>寄存器以 4 B 为粒度接收数据，维护完整有效掩码。当前操作数包就绪才能计算；下一组预取可以与当前组计算重叠。禁止收到第一拍后默认整个寄存器组已填满。</p>
+<h3 id="22">2.2 局部激活存储</h3>
+<p>为使详细模型可执行，本轮补充一个两方案共用的局部激活存储配置：八个 16 bit×4096 单端口宏，共 64 KiB，每个 bank 每周期最多一次读或写。无冲突时总读写吞吐上限为 16 B/周期；读写合计使用这份端口资源，读取延迟暂设一周期。它只保存激活、残差和中间结果，不保存权重。</p>
+<p>这是本轮明确的内部存储假设，不声称是最小容量，也不声称已满足 2.25 mm²。其宏面积及地址重排逻辑必须记入两种方案的面积清单。后续有官方宏面积或端口数据时替换，而不是增加第三组系统带宽实验。</p>
+<p>以 FFN2 为最大工作集，以下有效容量可以放入 64 KiB：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>张量</th>
+<th>数据格式</th>
+<th style="text-align: right;">容量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>当前输入 99×256</td>
+<td>INT8</td>
+<td style="text-align: right;">25,344 B</td>
+</tr>
+<tr>
+<td>残差 99×64</td>
+<td>INT8</td>
+<td style="text-align: right;">6,336 B</td>
+</tr>
+<tr>
+<td>完整 LN 前结果 99×64</td>
+<td>INT16</td>
+<td style="text-align: right;">12,672 B</td>
+</tr>
+<tr>
+<td>LN 后输出 99×64</td>
+<td>INT8</td>
+<td style="text-align: right;">6,336 B</td>
+</tr>
+<tr>
+<td>合计</td>
+<td>不含地址填充及其他工作区</td>
+<td style="text-align: right;">50,688 B</td>
+</tr>
+</tbody>
+</table></div>
+<p>分配完整 LN 前区域是用于容纳不同调度的共同容量上限，不代表严格逐行方案必须实际写满它。活跃行数与物理预留容量分开统计；可复用区域不得重复计入。剩余 14,848 B 用于布局填充、部分和和工作区，并由地址分配器检查，而不是全部默认可用。</p>
+<p>每种映射都要明确 tensor→bank→word 的地址函数。阵列跨 token 取相同归约位置，逐行单元取一行连续元素，布局可以不同，但装入时的排列成本要计入对应初始化阶段。内部存储不等于无限带宽：后台写入、残差读取和 LN 读写都参与相同 bank 仲裁。</p>
+<h3 id="23">2.3 片上参数与小寄存器</h3>
+<p>bias 与 gamma/beta 在测试前装入专用小参数区或寄存器，来源、容量和初始化时间单列。INT32 bias 每个 64 输出通道子图占 256 B；LN 参数位宽由量化配置确定。它们不隐含为免费常量逻辑。</p>
+<p>取消旧配置中的整矩阵权重缓存和八个权重 SRAM bank。矩阵输入、权重操作数、累加器、LN 工作寄存器分别列账，不能因取消权重 SRAM 就漏计寄存器。</p>
+<h2 id="3">3 替换两种计算单元的基线调度</h2>
+<h3 id="31-a">3.1 A 采用九行分组与小权重寄存器</h3>
+<p>每次处理九个 token，依次完成四个 16 输出通道块。每个归约位置装入 16 个 INT8 权重，列广播给九行；同一组权重同时参与 144 次乘法。</p>
+<pre><code class="language-text">for token_group in 11 个九行分组:
+    for output_group in 4 个十六通道分组:
+        初始化 9×16 个累加器，偏置只加入一次
+        for k in 0..R-1:
+            等待当前 16 B 权重包及九个激活元素
+            进行一次 9×16 更新
+            同时允许预取下一组权重
+        排空 9×16 个结果片段
+    九行的 64 通道逐步完整，交给残差和 LN
+</code></pre>
+<p>权重双寄存器组为 2×16 B＝32 B；144 个 INT32 累加器为 576 B。当前激活操作数可用两组九字节寄存器暂存；完整输入张量在内部激活 SRAM，不强制复制成九整行寄存器。</p>
+<p>权重端口稳态每八周期供应一组，此映射因此至多每八周期一次满阵列发射。激活读取、累加和排空仍需显式建模；有权重到达不代表其他条件必然满足。</p>
+<h3 id="32-b0">3.2 B0 采用严格逐行与小权重寄存器</h3>
+<p>每个 token 完成全部 64 个输出，再开始下一 token。每次计算两个输出通道，各并行处理 64 个归约元素。输出投影每对通道一次发射；FFN2 每对通道四次发射并累加。</p>
+<pre><code class="language-text">for token in 0..98:
+    将当前输入行读入 64 B 或 256 B 输入寄存器
+    for output_pair in 32 个输出通道对:
+        初始化两个部分和，偏置只加入一次
+        for k_chunk in R/64 个归约块:
+            等待当前 128 B 权重包
+            同时计算两个 64 项点积并累加
+            同时允许预取下一权重包
+        输出这两个通道
+    一行完整后交给残差和 LN
+</code></pre>
+<p>权重双寄存器组为 2×128 B＝256 B。输入行寄存器为 64 B 或 256 B；两个基本 INT32 部分和为 8 B，另计树流水与结果在途寄存器。LN 前一行 INT16 结果为 128 B。采用两组行结果缓冲时为 256 B，但只能在下游容量实际允许时交换。</p>
+<p>权重端口每 64 周期供应一个满宽包，因此严格逐行方案每次发射之间有较长装填间隔。该结论不要求增加权重缓存，它是“小权重包、不跨 token 保留已消费权重”这一基线策略的结果。</p>
+<h3 id="33">3.3 重新计算权重加载量</h3>
+<p>N=64，R 分别为 64 和 256，权重一遍为 R×64 B。A 每个九行组读一遍，共 11 遍；B0 每个 token 读一遍，共 99 遍。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>子图</th>
+<th style="text-align: right;">单遍权重</th>
+<th style="text-align: right;">A 权重读取总量</th>
+<th style="text-align: right;">B0 权重读取总量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输出投影</td>
+<td style="text-align: right;">4,096 B</td>
+<td style="text-align: right;">45,056 B</td>
+<td style="text-align: right;">405,504 B</td>
+</tr>
+<tr>
+<td>FFN2</td>
+<td style="text-align: right;">16,384 B</td>
+<td style="text-align: right;">180,224 B</td>
+<td style="text-align: right;">1,622,016 B</td>
+</tr>
+</tbody>
+</table></div>
+<p>按 2 B/周期，矩阵阶段仅权重搬运的稳态等效时间分别为：输出投影 A 22,528 周期、B0 202,752 周期；FFN2 A 90,112 周期、B0 811,008 周期。它们不含请求首尾、初始化、排空与额外局部冲突，不能当成详细仿真的精确结果。</p>
+<p>第一组九行 A 与第一行 B0 都必须取完整一遍权重，因此这一固定带宽条件下，两者首批完整矩阵结果的权重时间下界均为 2,048 周期或 8,192 周期。不能再套用“256 对 32”或“1024 对 128”的供数无限计算结果来宣称同样的首行优势。A 在一次权重遍历中形成九行，B0 形成一行。</p>
+<h2 id="4-token">4 新增小权重缓存的跨 token 调度</h2>
+<p>严格逐行 B0 是小行缓存方案，但不是 128 乘法器单元的唯一合理调度。本轮增加 B1：<strong>保留当前 128 B 权重包，依次让多个 token 使用它，再替换权重包。</strong> 它仍使用同一 300 MB/s 权重端口，仍只有两组 128 B 权重寄存器，不增加整层权重 SRAM。</p>
+<pre><code class="language-text">for output_pair in 32 个输出通道对:
+    初始化当前通道对的各 token 部分和
+    for k_chunk in R/64 个归约块:
+        装入并保留当前 128 B 权重包
+        for token in 当前 G 个 token:
+            从内部激活 SRAM 读取此 token 的 64 个输入元素
+            用当前权重包更新此 token 的两个输出
+        允许下一权重包提前装入另一组寄存器
+    写出当前 G 个 token 的两个完整输出通道
+</code></pre>
+<p>B1 的代价转移到激活工作区和 LN 等待：FFN2 至少要为当前通道对保存 2×G 个 INT32 部分和，G=99 时为 792 B；此前完成的其他通道放入 LN 前结果区。每行最后两个通道完成前，LN 不能完成该行归一化。该调度不再享有 B0 的“一行完成就立即进入 LN、只驻留一行结果”的全部优点。</p>
+<p>G=9 与 G=99 是两个明确调度配置，使用相同硬件单元，均不改变系统带宽。G=9 时与 A 同样遍历权重 11 次，适合核对同等跨 token 复用；G=99 时权重只读一遍，但要访问更大的激活工作集。报告中 B1 作为 B 单元的调度变体，不作为第三种硬件架构。</p>
+<p><strong>不能在减少权重读取后，又默认 B1 每周期都能发射。</strong> 每次发射要为当前 token 提供 64 B 激活，公共激活存储峰值为 16 B/周期，故单纯输入读取至少需四周期。若每个归约元素的激活都为每个输出对重新读取，输出投影需 99×32×64＝202,752 B，FFN2 需 99×32×256＝811,008 B，仅激活读带宽下界为 12,672 与 50,688 周期，尚未计部分和和结果读写。</p>
+<p>这种组织可能比 B0 好得多，也可能仍受局部访问限制；由同一个详细模拟器决定。输入重读减少、更多 token 驻留或部分和缓存可以继续优化，但新增寄存器、布局和访问必须计入，不能免费赋予。</p>
+<h2 id="5-ln">5 替换 LN 和后处理约定</h2>
+<p>LN 固定为 128 周期一行，延迟 L=128、启动间隔 II=128、最多一行在处理。不是“每周期接收新行、128 周期后输出”的深流水解释。保持本轮不扫描其他 LN 速度。</p>
+<p>LN 开始前必须满足：64 个输入通道及残差已对齐、输出空间已预留、所有所需输入已准备到 LN 工作寄存器。输入提取、与其他模块争用 bank、输出写入确认在 128 周期核心处理之外显式计时。行工作寄存器和参数寄存器计入面积，不能把 128 周期解释为包含任意长的内存等待。</p>
+<p>为使初版可执行，将 128 周期作为固定行级处理事件；其内部非线性算法由数值模型验证，不假装已经建立位精确电路。后续细化统计、倒平方根和仿射阶段时，替换这个事件，不能把各阶段时间再次叠加到 128 上。</p>
+<p>偏置先在正确累加尺度处理；残差支路先对齐尺度，再形成 INT16 LN 输入。后处理暂采用每周期最多八个通道、流水线结果延迟两周期的配置，作为独立处理资源；其内部 SRAM 请求仍参与公共仲裁，不能因为算术能处理八通道就免费读取或写入八通道。</p>
+<p>矩阵、后处理与 LN 可重叠，只要它们使用不同的执行资源并有缓冲容量。单个矩阵单元不允许同时执行两个矩阵算子。A 的通道片段按行组组装，B0 按单行组装，B1 按 token 与通道掩码组装；缓存释放以最后一次消费确认为准。</p>
+<h2 id="6">6 替换算术检查样例</h2>
+<p>以下只作为可手算的权重主导 L0 检查：忽略请求首尾、激活与残差访问、片段排空和后处理；采用稳定的 2 B/周期权重流，A 每遍权重结束后九行同时就绪，B0 每遍权重结束后一行就绪；LN 固定 128 周期，行缓冲充足。L1 详细结果必须包含被省略的开销。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>子图和映射</th>
+<th style="text-align: right;">矩阵权重阶段等效周期</th>
+<th style="text-align: right;">加上重叠后的 LN 完成周期</th>
+<th style="text-align: right;">按 150 MHz 换算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输出投影 A</td>
+<td style="text-align: right;">22,528</td>
+<td style="text-align: right;">23,680</td>
+<td style="text-align: right;">0.158 ms</td>
+</tr>
+<tr>
+<td>输出投影 B0</td>
+<td style="text-align: right;">202,752</td>
+<td style="text-align: right;">202,880</td>
+<td style="text-align: right;">1.353 ms</td>
+</tr>
+<tr>
+<td>FFN2 A</td>
+<td style="text-align: right;">90,112</td>
+<td style="text-align: right;">91,264</td>
+<td style="text-align: right;">0.608 ms</td>
+</tr>
+<tr>
+<td>FFN2 B0</td>
+<td style="text-align: right;">811,008</td>
+<td style="text-align: right;">811,136</td>
+<td style="text-align: right;">5.408 ms</td>
+</tr>
+</tbody>
+</table></div>
+<p>A 每组九行 LN 占 9×128＝1,152 周期，小于下一组权重加载的 2,048 或 8,192 周期，所以该理想化模型只在最后追加一组 LN 的尾部。B0 的行间隔也大于 128，最终追加一行 LN。两种情况下 LN 都不是基线主瓶颈。</p>
+<p>这些数字只描述指定的 A 与 B0 调度，不能宣布 B 架构失败。B1 的访存顺序、局部 SRAM 竞争和结果形成时间不同，必须单独模拟，不能直接把其“只读一遍权重”当作完整执行时间。</p>
+<p>在 A/B0 基线中，低 MAC 平均利用率本身是可预期的：A 每八周期一次满阵列更新，权重限制的稳态占空比上限约 12.5%；B0 每 64 周期一次满宽更新，上限约 1.5625%。LN、排空和首尾开销进一步降低平均值。此处的低利用率不同于“发射时只使用少数乘法器”，必须分开报告。</p>
+<h2 id="7">7 替换输出指标和验收要求</h2>
+<p>删除系统带宽扫描、LN 间隔扫描和“默认八个权重 SRAM bank”的基准。输出 A、B0、B1 各调度在固定条件下的以下指标：</p>
+<ol>
+<li>权重有效字节、物理字节、权重端口忙碌周期、权重寄存器填充和复用次数。</li>
+<li>内部激活、部分和、残差及 LN 的逐 bank 读写次数和冲突周期。</li>
+<li>首个矩阵片段、首行完整矩阵结果、首行 LN 完成、最后内部输出确认时刻。</li>
+<li>发射时的有效乘法器比例、发射占空比、端到端 MAC 利用率，分别列示分母。</li>
+<li>权重寄存器、激活寄存器、累加器、行组装、LN 工作区的物理预留与活跃峰值；SRAM 宏面积与标准单元面积状态。</li>
+</ol>
+<p>新增必须通过的检查：</p>
+<ul>
+<li>无复用时每个 128 B 权重包必须真实经过 32 个四字节拍；不得再从未配置的内部权重 SRAM 读出。</li>
+<li>A 的一组权重同时用于九个 token；B0 只用于当前 token；B1 复用次数由 G 和尾组有效 token 数决定。</li>
+<li>128 B 寄存器内容在所有消费者完成前不可覆盖，乒乓只能隐藏能够重叠的时间。</li>
+<li>300 MB/s 只应用一次，不同时叠加一个“16 B/周期权重 bank”限制。</li>
+<li>共享 SRAM 的激活读写计数在主窗口必须为零；初始化搬运另计。</li>
+<li>预加载操作数的纯计算测试仍需匹配原算术基准；恢复权重装填后匹配本修改条款的加载账本。</li>
+<li>LN 不能在一行只有部分通道、残差未到或输出空间不足时启动；相邻行启动至少间隔 128 周期。</li>
+<li>B1 增大权重复用时，必须同步增加或重用实际激活工作区，并反映首行变晚与局部读取开销。</li>
+<li>实验以最后内部输出确认为终点；不得继续使用旧报告“最后共享写回”的时间与本次结果混比。</li>
+</ul>
+<h2 id="8">8 对原文的删除与保留范围</h2>
+<p>替换原第 3 节的实验分组：本次只做固定 300 MB/s 下的 A、B0、B1 调度比较，不运行其他权重带宽。</p>
+<p>替换原第 6 节中本轮使用的存储配置、第 7 节的基线调度、第 8 节的 LN 参数、第 10 节相关配置、第 11 节输出边界、第 12 节融合检查样例和第 15 节扫描计划。纯算术发起周期仍可作为预加载测试，但不能作为本次供数受限的最终预测。</p>
+<p>原第 12.4 节对旧报告的审查只保留为历史说明，不作为新模型配置。保留原文的数值验证、两阶段仲裁、资源容量不变量、宏面积统计和 RTL 校准原则。</p>
+<p>本修改稿给出待实现规范和手算基准，未声称已经修改仿真源码或获得重新运行的结果。最终判断应同时看固定条件下的真实周期、缓存资源与面积，不再预先推荐某一种矩阵结构。</p></main></div></body></html>

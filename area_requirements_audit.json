@@ -1,0 +1,167 @@
+{
+  "audit_time": "2026-10-28T16:17:49.587811",
+  "source_pdf": "D:\\Downlosds\\文档\\嵌赛-赛题指南.pdf",
+  "source_sha256": "bd3cc3732a890ffc04a209fbcd70c6ac3c7acd566ed5b5512c589139d159a357",
+  "page_convention": "pdf_page is one-based including cover; printed_page excludes cover",
+  "area": {
+    "limit_mm2": 2.25,
+    "pdf_page": 13,
+    "printed_page": 12,
+    "included": [
+      "new accelerator standard cells",
+      "new interface logic",
+      "internal SRAM macros"
+    ],
+    "excluded": [
+      "reused E203",
+      "512 KB shared SRAM",
+      "fixed bus and peripherals"
+    ],
+    "standard_cell_measurement": "specified library synthesis mapping",
+    "sram_measurement": "organizer-provided macro area",
+    "verified_area_mm2": null,
+    "compliance": "unknown: no specified library / SRAM area / matching full RTL netlist synthesis result found"
+  },
+  "clock": {
+    "MHz": 150,
+    "pdf_page": 4,
+    "printed_page": 3
+  },
+  "memory": {
+    "shared_sram_KB": 512,
+    "internal_macro_bits_by_words": [
+      [
+        16,
+        128
+      ],
+      [
+        16,
+        1024
+      ],
+      [
+        16,
+        4096
+      ]
+    ],
+    "ports_allowed": [
+      "single",
+      "dual"
+    ],
+    "external_DDR_controller_allowed": false,
+    "pdf_page": 4
+  },
+  "precision": {
+    "choice": "team-defined fixed/float/mixed, widths, scales, rounding and saturation",
+    "pdf_page": 5,
+    "softmax_av_F6_required_by_problem": false,
+    "no_retrain_finetune_distill": true,
+    "FP32_bias_residual_allowed_by_problem": true,
+    "FP32_encoder_caveat": "allowed as mixed precision but all encoder calculations must execute inside accelerator and all float units count in mapped area/timing"
+  },
+  "accuracy": {
+    "top1_max_drop_percentage_points": 2.0,
+    "same_classification_head_required": true,
+    "pdf_page": 11,
+    "printed_page": 10,
+    "reference_accuracy_validation": 0.9763779527559056,
+    "minimum_accuracy_validation": 0.9563779527559056,
+    "minimum_correct_of_4445": 4252,
+    "note": "4445 validation threshold is a local development target; official 600-sample frozen evaluation is separate"
+  },
+  "scope": {
+    "input_output_shape": [
+      99,
+      64
+    ],
+    "encoder_layers": 12,
+    "hardware": [
+      "Q/K/V projections",
+      "QK transpose matmul",
+      "scaled softmax",
+      "probability AV matmul",
+      "attention output projection",
+      "residual",
+      "LayerNorm",
+      "FFN1/GELU/FFN2"
+    ],
+    "offline": [
+      "audio preprocessing",
+      "MFCC",
+      "input projection",
+      "class token",
+      "position embedding"
+    ],
+    "software_head": "same FP32 official head for both reference and quantized encoder; do not quantize it when assessing competition boundary",
+    "pdf_pages": [
+      6,
+      7
+    ]
+  },
+  "data": {
+    "calibration": "training split only, no gradients",
+    "precision_validation": "validation split",
+    "testing": "must not adjust weights / quantization / numeric config using testing samples; no testing audio opened by this audit",
+    "official_eval_samples": 600,
+    "pdf_pages": [
+      7,
+      8
+    ]
+  },
+  "performance": {
+    "hard_throughput_minimum_in_guide": null,
+    "throughput_score": "relative among qualified designs",
+    "timer_start": "input and parameter loading starts",
+    "timer_end": "all results written back",
+    "include_E203_bus_load_wait_time": true,
+    "empty_caches_at_task_start": true,
+    "same_frozen_config_and_netlist_for_all_metrics": true,
+    "pdf_pages": [
+      12,
+      13
+    ]
+  },
+  "technology": {
+    "node_nm": null,
+    "standard_cell_library": null,
+    "process_corner": null,
+    "sram_area_data": null,
+    "note": "guide mentions specified library/corner but supplies no names or numeric macro areas"
+  },
+  "tools_found": {
+    "path_commands": {
+      "yosys": null,
+      "dc_shell": null,
+      "vivado": null,
+      "quartus_sh": null,
+      "verilator": null,
+      "iverilog": null
+    },
+    "vivado_2020_2_bat": true,
+    "vitis_hls_2020_2_bat": true,
+    "additional_commands": {
+      "genus": null,
+      "openroad": null
+    },
+    "wsl_linux_distribution_available": false
+  },
+  "local_assets_found": {
+    "older_design_plan": "D:\\codex\\2026-10-26\\fe\\outputs\\KWT1_研究生组设计与实施方案.md",
+    "small_pe_rtl": "D:\\codex\\2026-10-22\\c\\outputs\\pe_verilog2001\\rtl\\pe_slice16.v",
+    "full_accelerator_rtl_in_scanned_codex": false,
+    "specified_lib_or_db_in_scanned_codex": false
+  },
+  "cautions": [
+    "Vivado FPGA resource count cannot establish ASIC mm2 budget",
+    "Narrow activations save SRAM area only if macros are packed/reduced, not merely if values use fewer significant bits",
+    "Mixed precision time-multiplexing may still require hardware for largest supported multiplier width",
+    "Bit operation proxy / parameters / software latency are not physical area measurements"
+  ],
+  "search_scope": [
+    "D:\\Downlosds",
+    "D:\\codex excluding data/environment/dependency caches",
+    "C:\\Users\\iluoning\\Downloads",
+    "C:\\Users\\iluoning\\Desktop",
+    "C:\\Users\\iluoning\\Documents",
+    "common ASIC tool installation roots"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "architecture": {"weight_banks": 64},
+  "provenance": {
+    "scenario_id": "assumed_bus16_banks64_cold",
+    "assumption_status": "hypothetical_high_bank_count_not_equal_resource_comparison"
+  }
+}

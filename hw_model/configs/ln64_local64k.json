@@ -1,0 +1,13 @@
+{
+  "local_memory": {
+    "banks": 8
+  },
+  "ln": {
+    "latency_cycles": 64,
+    "initiation_interval_cycles": 64
+  },
+  "provenance": {
+    "scenario_id": "fixed300_local64k_ln64",
+    "assumption_status": "user_revision_20261029_ln64_local64k_no_spill"
+  }
+}

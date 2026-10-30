@@ -1,0 +1,18 @@
+{
+  "platform": {
+    "shared_bytes": null, "beat_bytes": null,
+    "read_latency": null, "write_latency": null, "accept_interval": null,
+    "max_outstanding": null, "read_write_shared": null,
+    "clock_hz": null, "background_period": null
+  },
+  "architecture": {
+    "weight_banks": null, "activation_banks": null,
+    "bank_depth_words": null, "bank_port_mode": null, "bank_latency": null,
+    "bank_byte_write_mask": null,
+    "dma_fifo_bytes": null, "dma_unpack_words_per_cycle": null
+  },
+  "provenance": {
+    "scenario_id": "platform_unknown_requires_confirmation",
+    "assumption_status": "unknown_platform_not_executable"
+  }
+}

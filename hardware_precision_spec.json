@@ -1,0 +1,72 @@
+{
+  "status": "architecture_and_measurement_template_not_synthesized",
+  "accuracy_recommendation": null,
+  "area_compliance_verified": false,
+  "synthesized_area_mm2": null,
+  "constraints": {"area_limit_mm2": 2.25, "minimum_frequency_mhz": 150, "clock_period_ns": 6.666666666666667},
+  "scope": {"accelerated_blocks": 12, "matrix_products": 96, "macs_per_audio": 73446912, "matrix_weights": 589824, "software_ops": ["patch_projection", "embedding_preparation", "FP32_classification_head"], "testing_samples_used": 0},
+  "shared_pe": {"multiplier_a_bits": 8, "multiplier_b_bits": 8, "signed": true, "pe_count_candidates": [16, 32, 64], "accumulator_candidates_bits": [32, 40], "weight_bits_candidates": [6, 8], "activation_bits_candidates": [8, 10, 12, 16], "probability_bits_independent": true},
+  "multi_pass": {
+    "radix256": {"low_digit": "unsigned 0..255 transformed d=s+256h for signed8 PE", "product_correction": "s_i*s_j + 256*(h_i*s_j+h_j*s_i) + 65536*h_i*h_j", "a16_w8_multiplications_per_scalar": 2, "a16_a16_multiplications_per_scalar": 4, "correction_cycles_included": false},
+    "radix128": {"low_digit_range": [0, 127], "top_digit": "arithmetic shift, signed at most 8 bits", "chunks_for_bits": {"8": 1, "10": 2, "12": 2, "16": 3}, "a16_w8_multiplications_per_scalar": 3, "a16_a16_multiplications_per_scalar": 9, "unsigned_multiplier_required": false},
+    "rounding": "retain exact aligned partial products, round once at complete-dot output",
+    "intermediate_shift_overflow_analysis_required": true
+  },
+  "minimum_final_accumulator_bits": {
+    "formula": "bit_length(K*(2^(a_bits-1)-1)*(2^(b_bits-1)-1))+1",
+    "dense_k256": {"w6_a8": 21, "w6_a10": 23, "w6_a12": 25, "w6_a16": 29, "w8_a8": 23, "w8_a10": 25, "w8_a12": 27, "w8_a16": 31},
+    "qk_k64_equal_activation_bits": {"8": 21, "10": 25, "12": 29, "16": 37},
+    "av_k99_equal_activation_bits": {"8": 22, "10": 26, "12": 30, "16": 38},
+    "av_p16_v12": 34,
+    "excludes": ["bias", "residual", "requantization_left_shift", "partial_product_transient_values", "nonlinear_internal_arithmetic"],
+    "nonlinear_internal_reference_bits": 64,
+    "must_recompute_from_final_candidate": true
+  },
+  "packed_w6": {"signed_range": [-31, 31], "unused_code": -32, "group_weight_count": 8, "group_bits": 48, "sram_words_per_group": 3, "sram_word_bits": 16, "unpack_sign_extend": "{{2{q[5]}},q}", "matrix_layout": "input_output", "endianness_and_bit_order_must_be_fixed": true, "per_layer_weights": 49152, "w8_bytes_per_layer": 49152, "w6_bytes_per_layer": 36864, "w8_all_layers_kib": 576, "w6_all_layers_kib": 432},
+  "sram_macro_types": [
+    {"width_bits": 16, "depth_words": 128, "capacity_bytes": 256, "area_mm2": null},
+    {"width_bits": 16, "depth_words": 1024, "capacity_bytes": 2048, "area_mm2": null},
+    {"width_bits": 16, "depth_words": 4096, "capacity_bytes": 8192, "area_mm2": null}
+  ],
+  "working_buffer_example": {
+    "not_frozen_architecture": true,
+    "tile_m_n_k": [8, 8, 64],
+    "logical_bank_width_bits": 16,
+    "banks_for_8_int8_partial_inputs": 4,
+    "whole_layer_weight_cache_included": false,
+    "entries": [
+      {"name": "X_ping_pong_K_V", "macro_128": 0, "macro_1024": 32, "macro_4096": 0, "capacity_bytes": 65536},
+      {"name": "score_probability_rows", "macro_128": 2, "macro_1024": 0, "macro_4096": 0, "capacity_bytes": 512},
+      {"name": "FFN_hidden_tile", "macro_128": 0, "macro_1024": 2, "macro_4096": 0, "capacity_bytes": 4096},
+      {"name": "weight_tile_double_buffer", "macro_128": 8, "macro_1024": 0, "macro_4096": 0, "capacity_bytes": 2048},
+      {"name": "activation_digit_tile_double_buffer", "macro_128": 8, "macro_1024": 0, "macro_4096": 0, "capacity_bytes": 2048},
+      {"name": "LayerNorm_row", "macro_128": 1, "macro_1024": 0, "macro_4096": 0, "capacity_bytes": 256},
+      {"name": "LayerNorm_parameters", "macro_128": 2, "macro_1024": 0, "macro_4096": 0, "capacity_bytes": 512},
+      {"name": "FP32_bias", "macro_128": 0, "macro_1024": 1, "macro_4096": 0, "capacity_bytes": 2048},
+      {"name": "configuration_example", "macro_128": 1, "macro_1024": 0, "macro_4096": 0, "capacity_bytes": 256},
+      {"name": "shared_nonlinear_ROM", "macro_128": 1, "macro_1024": 1, "macro_4096": 1, "capacity_bytes": 10496}
+    ],
+    "total_macro_128": 23,
+    "total_macro_1024": 36,
+    "total_macro_4096": 1,
+    "total_capacity_bytes": 87808,
+    "total_capacity_kib": 85.75,
+    "omitted_from_example": ["DMA_FIFO", "CDC", "ECC", "port_replication", "registers", "optional_whole_layer_weight_cache"],
+    "bandwidth_and_liveness_schedule_required": true
+  },
+  "shared_nonlinear_rom": {"physical_table_count": 2, "softmax_words": 4096, "softmax_word_bits": 16, "softmax_payload_bytes": 8192, "gelu_words": 1025, "gelu_word_bits": 16, "gelu_payload_bytes": 2050, "payload_bytes_total": 10242, "macro_capacity_bytes_example": 10496, "gelu_interpolation": "integer linear", "replicated_per_layer": false, "read_ports_require_schedule_or_extra_banks": true},
+  "fp32_boundary_cost": {"bias_and_residual_current_reference_fp32": true, "shared_fp32_adder_and_converters_must_be_counted_if_on_accelerator": true, "free_E203_offload_assumed": false, "all_integer_interface_requires_new_accuracy_validation": true},
+  "area_measurement": {
+    "formula": "PE+accum_requant+nonlinear+FP32_interface+control+DMA_bus+clock_repair+sum(macro_count*official_macro_area)",
+    "official_standard_cell_library": null,
+    "official_macro_LEF_area": null,
+    "synthesis_tool": null,
+    "synthesis_report": null,
+    "postlayout_report": null,
+    "shared_512kib_and_E203_exclusion": "follow official scope; newly added storage and interfaces are not automatically excluded",
+    "area_unit_conversion": "um2 / 1000000 = mm2",
+    "avoid_macro_double_counting": true,
+    "verification_fields": ["PE_count", "native_multiplier_width", "accumulator_width", "partial_product_scheme", "cell_area", "macro_area", "FP32_interface_area", "total_area", "excluded_blocks", "frequency", "timing_slack", "library_corner", "tool_version", "report_paths"]
+  },
+  "performance_lower_bound_example": {"PE_count": 64, "single_pass_cycles_only": 1147608, "frequency_mhz": 150, "single_pass_ms_only": 7.65072, "measured_latency": false, "excludes": ["extra_precision_passes", "sign_correction", "memory_stalls", "DMA", "nonlinear", "FP32_interface"]}
+}

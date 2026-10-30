@@ -1,0 +1,58 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "KWT-1: CPU checkpoint smoke",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_kwt_fp32.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": ["--repo", "keyword-transformer", "--smoke", "--out", "runs/smoke"],
+      "env": {"CUDA_VISIBLE_DEVICES": "-1"},
+      "justMyCode": true
+    },
+    {
+      "name": "KWT-1: first 32 validation samples",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_kwt_fp32.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": ["--repo", "keyword-transformer", "--data-dir", "data2", "--split", "validation",
+               "--limit", "32", "--batch-size", "1", "--out", "runs/validation_32"],
+      "env": {"CUDA_VISIBLE_DEVICES": "-1"},
+      "justMyCode": true
+    },
+    {
+      "name": "KWT-1: W16A16 first 32 validation samples",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_kwt_int16.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": ["--repo", "keyword-transformer", "--data-dir", "data2", "--baseline-run", "runs/validation_full", "--batch-size", "32", "--calibration-samples", "256", "--activation-headroom", "1.25", "--limit", "32"],
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "-1",
+        "TEMP": "${workspaceFolder}/.tmp",
+        "TMP": "${workspaceFolder}/.tmp"
+      },
+      "justMyCode": true
+    },
+    {
+      "name": "KWT-1: W8A8 + N16 + AV F6 first 32 validation samples",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_kwt_int8_n16.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": ["--limit", "32", "--batch-size", "32", "--calibration-samples", "256", "--activation-headroom", "1.25"],
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "-1",
+        "TEMP": "${workspaceFolder}/.tmp",
+        "TMP": "${workspaceFolder}/.tmp"
+      },
+      "justMyCode": true
+    }
+  ]
+}
