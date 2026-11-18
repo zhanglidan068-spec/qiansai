@@ -1,0 +1,15 @@
+{
+  "run_kwt_nibble_search.py": "c69cab81716c3da1a4bd7118fe36aa13a9f79e59936d43b770029e49499b7e0f",
+  "kwt_nibble_graph.py": "c1c1b85fa417e8833f0e8602ed4bf4c030a685db02545af69ecc8fd27d0b9872",
+  "kwt_mixed_graph.py": "96a283f6e2cb9c07524c8ba243e39f50f945d342c2884d1961c6de5cfca5a22a",
+  "nibble_early_exit.py": "0c2a3f7463253db3cde6b015855c40272b45c06952f32f4119e04e6f520b8e40",
+  "verify_nibble_early_exit.py": "e38fa5a2182f93a4005c2cd50fe4b6dec373c514caacd1a1d154dc657dfab4ba",
+  "nibble_native.py": "e6ef2bdcfaa03e05c22ead3bf4fa6abf0b940954a17463d020d89b92043b5ae5",
+  "nibble_matmul.cpp": "8ec508f8cb84926545a4ccc1d21f112c7637086de99d2a8a27b8da3e6a9fb45a",
+  "kwt_nonlinear_int16.py": "4ebc2d0d08851355119cdfec49c89c0707b084fe2137b7e04184d66f4159c1d0",
+  "compact_gelu_int16.py": "447bc5ab11b444399428b7650277981172542d5cb9a9082af3c934c239bf5f99",
+  "compact_softmax_int16.py": "c081cc5cbcb431a9acfeb05fddbd7ce7b7b6e8e208dd082333e425d6e4957fb1",
+  "kwt_int8_n16_graph.py": "c75feb0e5d38106c28deeed2848c7d8a9c3f55dcce56305a403be7180aa3a4dc",
+  "run_kwt_fp32.py": "cc19319156942c52a49b996f5bee61ab9c9443133f00302435d53b312a306d04",
+  "run_kwt_int16.py": "e3c5548a165a386697eb86add0223a619aadeb7886bb07c777c6086ea0a19229"
+}

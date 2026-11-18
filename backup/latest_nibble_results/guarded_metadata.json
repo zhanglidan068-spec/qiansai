@@ -1,0 +1,22 @@
+{
+  "created_time": "20261030_203219_790162",
+  "main_completion_sha256": "2e72aef25d58cae1b273e536dcfb98c892a1c013c242847e82457cbee2a5db36",
+  "same_run_fresh_baselines_reused": true,
+  "older_run_prediction_files_read": false,
+  "baseline_prediction_sha256": {
+    "fp32": "50cc4b8b442e025aa572790716dd6b293ed45422c6ad9265c0da7349f9f3a82a",
+    "w8a8": "a6d4aef5bd0437380b53528db8fcedb3810691a88aaf12ee24b6cd144b698f0b"
+  },
+  "input_cache": "D:\\codex\\kwt_fp32\\runs\\precision_search_20261028_162338_802026\\validation_mfcc.npy",
+  "feature_sha256": "55a10df229a408c763a1d6bebc281ed3b38f7982c17ab5f16c79b4c3494aef64",
+  "calibration_split": "training",
+  "validation_samples": 4445,
+  "testing_samples_used": 0,
+  "audio_files_opened": 0,
+  "training_or_weight_updates": false,
+  "preserves_main_completion_and_selected_policy": true,
+  "optional_third_sigma": null,
+  "slot_comparison": "Compare guarded approximation against an exact-zero-tail control over the same selected operations",
+  "synthesized": false,
+  "hardware_speedup_measured": false
+}

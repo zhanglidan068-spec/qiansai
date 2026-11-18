@@ -1,0 +1,8 @@
+{
+  "issue": "TF2.4 control-flow-v1 inner Dense branch stage-count tensor cannot be directly fetched",
+  "affected_trials": [],
+  "completed_baselines_preserved": true,
+  "arithmetic_changed": false,
+  "fix": "collect the returned counts inside executed stateful native callback; assert exactly one call per selected Dense per batch",
+  "source_versions_recorded_on_resume": true
+}

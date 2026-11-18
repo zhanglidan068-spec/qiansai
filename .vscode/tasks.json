@@ -166,6 +166,24 @@
         "reveal": "always",
         "panel": "dedicated"
       }
+    },
+    {
+      "label": "KWT-1: progressive four-bit product search (validation only)",
+      "type": "process",
+      "command": "${workspaceFolder}/.conda/python.exe",
+      "args": ["-B", "-u", "${workspaceFolder}/run_kwt_nibble_experiments.py"],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "CUDA_VISIBLE_DEVICES": "-1",
+          "TF_CPP_MIN_LOG_LEVEL": "3",
+          "PYTHONIOENCODING": "utf-8",
+          "TEMP": "${workspaceFolder}/.tmp",
+          "TMP": "${workspaceFolder}/.tmp"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated"}
     }
   ]
 }

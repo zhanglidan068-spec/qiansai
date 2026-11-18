@@ -1,0 +1,25 @@
+{
+  "finalized_utc": "2026-10-30T13:06:13.843546+00:00",
+  "testing_samples_used": 0,
+  "current_run_execution": "main phase, resumed after TF2.4 counter-fetch compatibility fix; then guarded supplement; summary; independent audit",
+  "workflow_wrapper_used_for_this_run": false,
+  "frozen_workflow_support": "The wrapper and VS Code task are for reproducing a NEW experiment, not a claim they launched this completed run.",
+  "source_history": {
+    "initial": "source/",
+    "main_fixed": "source_versions/20261030_195738_510636/",
+    "guarded": "guarded_source/",
+    "compatibility_fix": "development_fix_record.json"
+  },
+  "audit_file": "independent_audit.json",
+  "audit_sha256": "2c76f1aa6b839bd99cf5477a33cd92e5ec76ed7cc8e269d3deb75d572e469479",
+  "report_file": "README_四位渐进乘法实验结果.md",
+  "report_sha256": "aa41b3368b73b08deb5750971500784d0a6b95b4c9f2b7947d2357c1bfa766ac",
+  "strict_policy_file": "recommended_strict_policy.json",
+  "strict_policy_sha256": "3f4798b5943284fed5d841170e74135d2ddff7c41c733a2fd1d71df807916978",
+  "relaxed_policy_file": "recommended_2pp_policy.json",
+  "relaxed_policy_sha256": "7c3121644bcafce49479f82df1a24e48557121c1ec02499588ca3f3d4befb6a8",
+  "workflow_support_hashes": "workflow_support/sha256.json",
+  "original_experiments_preserved": true,
+  "hardware_speedup_measured": false,
+  "area_compliance_verified": false
+}

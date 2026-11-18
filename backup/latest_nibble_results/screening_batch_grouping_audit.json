@@ -1,0 +1,35 @@
+{
+  "verified": true,
+  "screen_controls": [
+    {
+      "name": "exact_zero_tail_control",
+      "samples": 384,
+      "logits_bit_exact_vs_full_baseline_subset": false,
+      "changed_logit_elements": 451,
+      "max_abs_logit_difference": 0.0462835431098938,
+      "classification_flips": 0,
+      "patch_max_abs_difference": 1.3113021850585938e-06
+    }
+  ],
+  "full_controls": [
+    {
+      "name": "exact_zero_tail_control",
+      "samples": 4445,
+      "logits_bit_exact_vs_full_baseline_subset": true,
+      "changed_logit_elements": 0,
+      "max_abs_logit_difference": 0.0,
+      "classification_flips": 0,
+      "patch_max_abs_difference": 0.0
+    },
+    {
+      "name": "all_dense_exact_zero_tail_control",
+      "samples": 4445,
+      "logits_bit_exact_vs_full_baseline_subset": true,
+      "changed_logit_elements": 0,
+      "max_abs_logit_difference": 0.0,
+      "classification_flips": 0,
+      "patch_max_abs_difference": 0.0
+    }
+  ],
+  "interpretation": "Screen regrouping can alter FP32 patch/head rounding and downstream quantization boundaries. Full natural-order exact controls isolate arithmetic changes."
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "name": "guarded_ffn_sigma_128_sll_only",
+    "exact_zero_tail_control": "exact_zero_tail_control",
+    "selected_operations": 24,
+    "encoder_saved_fraction": 0.19247083480026678,
+    "control_encoder_saved_fraction": 0.1836934824471581,
+    "additional_encoder_slot_saving_over_same_scope_control": 0.00877735235310867,
+    "same_operation_scope": true
+  },
+  {
+    "name": "guarded_ffn_sigma_256_sll_only",
+    "exact_zero_tail_control": "exact_zero_tail_control",
+    "selected_operations": 24,
+    "encoder_saved_fraction": 0.18771306342259758,
+    "control_encoder_saved_fraction": 0.1836934824471581,
+    "additional_encoder_slot_saving_over_same_scope_control": 0.004019580975439474,
+    "same_operation_scope": true
+  },
+  {
+    "name": "guarded_ffn_ratio_2_sll_only",
+    "exact_zero_tail_control": "exact_zero_tail_control",
+    "selected_operations": 24,
+    "encoder_saved_fraction": 0.19468247260639857,
+    "control_encoder_saved_fraction": 0.1836934824471581,
+    "additional_encoder_slot_saving_over_same_scope_control": 0.010988990159240458,
+    "same_operation_scope": true
+  },
+  {
+    "name": "guarded_ffn_ratio_8_sll_only",
+    "exact_zero_tail_control": "exact_zero_tail_control",
+    "selected_operations": 24,
+    "encoder_saved_fraction": 0.18653710985554728,
+    "control_encoder_saved_fraction": 0.1836934824471581,
+    "additional_encoder_slot_saving_over_same_scope_control": 0.002843627408389171,
+    "same_operation_scope": true
+  },
+  {
+    "name": "guarded_ffn_ratio_16_sll_only",
+    "exact_zero_tail_control": "exact_zero_tail_control",
+    "selected_operations": 24,
+    "encoder_saved_fraction": 0.18493659504232857,
+    "control_encoder_saved_fraction": 0.1836934824471581,
+    "additional_encoder_slot_saving_over_same_scope_control": 0.0012431125951704591,
+    "same_operation_scope": true
+  },
+  {
+    "name": "guarded_all_dense_ratio_2_sll_only",
+    "exact_zero_tail_control": "all_dense_exact_zero_tail_control",
+    "selected_operations": 72,
+    "encoder_saved_fraction": 0.23173322349341352,
+    "control_encoder_saved_fraction": 0.19774429558790274,
+    "additional_encoder_slot_saving_over_same_scope_control": 0.03398892790551078,
+    "same_operation_scope": true
+  },
+  {
+    "name": "guarded_all_dense_ratio_8_sll_only",
+    "exact_zero_tail_control": "all_dense_exact_zero_tail_control",
+    "selected_operations": 72,
+    "encoder_saved_fraction": 0.2083837816850189,
+    "control_encoder_saved_fraction": 0.19774429558790274,
+    "additional_encoder_slot_saving_over_same_scope_control": 0.010639486097116152,
+    "same_operation_scope": true
+  },
+  {
+    "name": "guarded_all_dense_ratio_8_sll_only_final",
+    "exact_zero_tail_control": "all_dense_exact_zero_tail_control",
+    "selected_operations": 72,
+    "encoder_saved_fraction": 0.2083837816850189,
+    "control_encoder_saved_fraction": 0.19774429558790274,
+    "additional_encoder_slot_saving_over_same_scope_control": 0.010639486097116152,
+    "same_operation_scope": true
+  }
+]

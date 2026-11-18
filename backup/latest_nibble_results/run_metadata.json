@@ -1,0 +1,37 @@
+{
+  "purpose": "Progressive four-bit multiplication on frozen W8A8/N16/P8F7",
+  "created_time": "20261030_194837_662438",
+  "parent": "D:\\codex\\kwt_fp32\\runs\\precision_search_20261028_162338_802026",
+  "batch_size": 32,
+  "calibration_samples": 256,
+  "validation_samples": 4445,
+  "screening_samples": 384,
+  "testing_samples_used": 0,
+  "audio_files_opened": 0,
+  "training_or_weight_updates": false,
+  "historical_prediction_files_read": false,
+  "input_reuse": "MFCC acoustic inputs only; logits computed afresh",
+  "fp32_reference_expected_correct": 4340,
+  "w8a8_reference_expected_correct": 4338,
+  "target_extra_drop_vs_w8a8_pp": 0.1,
+  "original_limit_drop_vs_fp32_pp": 2.0,
+  "encoder_macs_per_sample": 73446912,
+  "native_threads": 4,
+  "tensorflow": "2.4.0",
+  "numpy": "1.19.5",
+  "input_sha256": {
+    "D:\\codex\\kwt_fp32\\runs\\precision_search_20261028_162338_802026\\validation_mfcc.npy": "55a10df229a408c763a1d6bebc281ed3b38f7982c17ab5f16c79b4c3494aef64",
+    "D:\\codex\\kwt_fp32\\runs\\precision_search_20261028_162338_802026\\calibration_mfcc.npy": "1b9da16bee0924df30b49be38b3f5c9958be7ee8a2cec590975e49e97776322b",
+    "D:\\codex\\kwt_fp32\\runs\\precision_search_20261028_162338_802026\\calibration_ranges.json": "0578e03f86d5e7d44e468f9aa367d43b2386cbbe74edec94a71d4baf37575d6f",
+    "D:\\codex\\kwt_fp32\\runs\\precision_search_20261028_162338_802026\\sample_manifest.json": "1c81b67dfc38bed3313d8de51f23be805c305db3cedeb242685a82a3f2d08f2e",
+    "D:\\codex\\kwt_fp32\\runs\\precision_search_20261028_162338_802026\\calibration_manifest.json": "88d3e452a8e04c3460addc0beb274350144087450d4d2c6582790e6e5fa1e909"
+  },
+  "quantization_sha256": "ad9cce95d1c1a4c49a62efe5776ff5867ff7a328daef96a01e47e512e03aa2ce",
+  "checkpoint_sha256": {
+    "best_weights.data-00000-of-00001": "ae993f6ed995938c1ab584b0857b35ca18f31f88001c7e17c7d7c3868bd33ad3",
+    "best_weights.index": "5a60a0fa78a1855572084a42669768e2998d37e7d93c833962960fdb0db70fbc"
+  },
+  "synthesized": false,
+  "hardware_speedup_measured": false,
+  "area_compliance_verified": false
+}

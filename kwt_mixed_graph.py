@@ -12,7 +12,8 @@ import math
 from kwt_int8_n16_graph import _existing_layers
 
 
-def build_search_graph(tf, model, kwt, calibration_ranges, nonlinear_config):
+def build_search_graph(tf, model, kwt, calibration_ranges, nonlinear_config,
+                       dense_integer_matmul=None):
     """Return ``(outputs, controls, records)``; all controls are feedable.
 
     ``outputs`` has the same 15 keys as the existing quantized experiment.
@@ -27,6 +28,9 @@ def build_search_graph(tf, model, kwt, calibration_ranges, nonlinear_config):
     ``calibration_ranges`` maps operand keys to training-only max |x|; values
     may also be dicts with a ``max_abs``/``maximum``/``calibration_max_abs``.
     Integer nonlinear kernels retain their static training-calibrated config.
+    ``dense_integer_matmul``, if supplied, receives (prefix, left, right) and
+    returns an integer dot product before dequantization/bias. The default
+    remains exact tf.matmul. QK and AV are unaffected by this optional hook.
     ``records`` exposes operands, bounded integer codes, clipping counts and
     selected nonlinear interfaces.  Dummy nonlinear integer interfaces are
     zeros when that layer selects FP32; ``used_int16`` identifies this case.
@@ -115,7 +119,9 @@ def build_search_graph(tf, model, kwt, calibration_ranges, nonlinear_config):
 
         def integer_product():
             shape = tf.shape(left)
-            accumulator = tf.matmul(tf.reshape(left, [-1, shape[-1]]), right)
+            flattened = tf.reshape(left, [-1, shape[-1]])
+            accumulator = (tf.matmul(flattened, right) if dense_integer_matmul is None
+                           else dense_integer_matmul(prefix, flattened, right))
             result = dequantize(accumulator, left_key, right_key)
             result = tf.reshape(result, tf.concat([shape[:-1], [layer.units]], axis=0))
             result.set_shape(value.shape.as_list()[:-1] + [layer.units])

@@ -1,0 +1,636 @@
+{
+  "passed": true,
+  "unique_integer_pairs": 65025,
+  "exact_reconstruction_pairs": 65025,
+  "scalar_oracle_configurations": 12,
+  "scalar_oracle_pair_checks": 780300,
+  "remaining_error_bound_checks": 195075,
+  "invalid_configuration_checks": 5,
+  "zero_term_optimization": false,
+  "statistics": [
+    {
+      "mode": "exact",
+      "threshold": 0.0,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 65025
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 65025,
+        "LH": 65025,
+        "LL": 65025
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 260100,
+      "mean_terms_per_pair": 4.0,
+      "saved_term_fraction": 0.0,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 215296,
+      "saved_nonzero_term_fraction": 0.0,
+      "changed_pair_count": 0,
+      "max_abs_error": 0,
+      "mean_abs_error": 0.0,
+      "root_mean_squared_error": 0.0,
+      "max_relative_error_nonzero_products": 0.0,
+      "mean_relative_error_nonzero_products": 0.0,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "sigma",
+      "threshold": 0.0,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 65025,
+        "2": 0,
+        "3": 0,
+        "4": 0
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 0,
+        "LH": 0,
+        "LL": 0
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 65025,
+      "mean_terms_per_pair": 1.0,
+      "saved_term_fraction": 0.75,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 50176,
+      "saved_nonzero_term_fraction": 0.7669441141498217,
+      "changed_pair_count": 64320,
+      "max_abs_error": 3585,
+      "mean_abs_error": 903.2931949250288,
+      "root_mean_squared_error": 1092.1108308671548,
+      "max_relative_error_nonzero_products": 1.0,
+      "mean_relative_error_nonzero_products": 0.4122894106754349,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "sigma",
+      "threshold": 0.0,
+      "stages": "ll_only",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 0,
+        "2": 0,
+        "3": 65025,
+        "4": 0
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 65025,
+        "LH": 65025,
+        "LL": 0
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 195075,
+      "mean_terms_per_pair": 3.0,
+      "saved_term_fraction": 0.25,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 157696,
+      "saved_nonzero_term_fraction": 0.26753864447086806,
+      "changed_pair_count": 57600,
+      "max_abs_error": 225,
+      "mean_abs_error": 56.69204152249135,
+      "root_mean_squared_error": 77.80392156862744,
+      "max_relative_error_nonzero_products": 1.0,
+      "mean_relative_error_nonzero_products": 0.05446489560869477,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "sigma",
+      "threshold": 256.0,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 50176,
+        "2": 4352,
+        "3": 4352,
+        "4": 6145
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 14849,
+        "LH": 10497,
+        "LL": 6145
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 96516,
+      "mean_terms_per_pair": 1.4842906574394463,
+      "saved_term_fraction": 0.6289273356401384,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 68956,
+      "saved_nonzero_term_fraction": 0.6797153686087991,
+      "changed_pair_count": 58140,
+      "max_abs_error": 3585,
+      "mean_abs_error": 793.9100346020762,
+      "root_mean_squared_error": 1043.3128721401815,
+      "max_relative_error_nonzero_products": 0.7336108220603538,
+      "mean_relative_error_nonzero_products": 0.20320646224701389,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "sigma",
+      "threshold": 1024.0,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 45056,
+        "2": 1536,
+        "3": 2344,
+        "4": 16089
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 19969,
+        "LH": 18433,
+        "LL": 16089
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 119516,
+      "mean_terms_per_pair": 1.838000768935025,
+      "saved_term_fraction": 0.5404998077662437,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 86928,
+      "saved_nonzero_term_fraction": 0.5962395957193817,
+      "changed_pair_count": 48568,
+      "max_abs_error": 3585,
+      "mean_abs_error": 756.0441061130334,
+      "root_mean_squared_error": 1033.6333511854261,
+      "max_relative_error_nonzero_products": 0.5818701510820743,
+      "mean_relative_error_nonzero_products": 0.16133684721437283,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "sigma",
+      "threshold": 1e+20,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 65025
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 65025,
+        "LH": 65025,
+        "LL": 65025
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 260100,
+      "mean_terms_per_pair": 4.0,
+      "saved_term_fraction": 0.0,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 215296,
+      "saved_nonzero_term_fraction": 0.0,
+      "changed_pair_count": 0,
+      "max_abs_error": 0,
+      "mean_abs_error": 0.0,
+      "root_mean_squared_error": 0.0,
+      "max_relative_error_nonzero_products": 0.0,
+      "mean_relative_error_nonzero_products": 0.0,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "sigma",
+      "threshold": 1e+20,
+      "stages": "ll_only",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 65025
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 65025,
+        "LH": 65025,
+        "LL": 65025
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 260100,
+      "mean_terms_per_pair": 4.0,
+      "saved_term_fraction": 0.0,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 215296,
+      "saved_nonzero_term_fraction": 0.0,
+      "changed_pair_count": 0,
+      "max_abs_error": 0,
+      "mean_abs_error": 0.0,
+      "root_mean_squared_error": 0.0,
+      "max_relative_error_nonzero_products": 0.0,
+      "mean_relative_error_nonzero_products": 0.0,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "ratio",
+      "threshold": 0.0,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 65025,
+        "2": 0,
+        "3": 0,
+        "4": 0
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 0,
+        "LH": 0,
+        "LL": 0
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 65025,
+      "mean_terms_per_pair": 1.0,
+      "saved_term_fraction": 0.75,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 50176,
+      "saved_nonzero_term_fraction": 0.7669441141498217,
+      "changed_pair_count": 64320,
+      "max_abs_error": 3585,
+      "mean_abs_error": 903.2931949250288,
+      "root_mean_squared_error": 1092.1108308671548,
+      "max_relative_error_nonzero_products": 1.0,
+      "mean_relative_error_nonzero_products": 0.4122894106754349,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "ratio",
+      "threshold": 1.0,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 36441,
+        "2": 20740,
+        "3": 6944,
+        "4": 900
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 28584,
+        "LH": 7844,
+        "LL": 900
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 102353,
+      "mean_terms_per_pair": 1.5740561322568243,
+      "saved_term_fraction": 0.6064859669357939,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 77480,
+      "saved_nonzero_term_fraction": 0.6401233650416172,
+      "changed_pair_count": 61800,
+      "max_abs_error": 3585,
+      "mean_abs_error": 729.9494040753557,
+      "root_mean_squared_error": 1002.656762080212,
+      "max_relative_error_nonzero_products": 0.4838709677419355,
+      "mean_relative_error_nonzero_products": 0.1807782268110702,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "ratio",
+      "threshold": 4.0,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 61,
+        "2": 32736,
+        "3": 27200,
+        "4": 5028
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 64964,
+        "LH": 32228,
+        "LL": 5028
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 167245,
+      "mean_terms_per_pair": 2.57201076509035,
+      "saved_term_fraction": 0.35699730872741253,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 135844,
+      "saved_nonzero_term_fraction": 0.3690361177170036,
+      "changed_pair_count": 54252,
+      "max_abs_error": 1905,
+      "mean_abs_error": 262.78625144175317,
+      "root_mean_squared_error": 461.72052176105603,
+      "max_relative_error_nonzero_products": 0.2,
+      "mean_relative_error_nonzero_products": 0.05477742090995508,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "ratio",
+      "threshold": 16.0,
+      "stages": "all",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 61,
+        "2": 224,
+        "3": 48520,
+        "4": 16220
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 64964,
+        "LH": 64740,
+        "LL": 16220
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 210949,
+      "mean_terms_per_pair": 3.2441214917339485,
+      "saved_term_fraction": 0.18896962706651288,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 173916,
+      "saved_nonzero_term_fraction": 0.19220050535077293,
+      "changed_pair_count": 41380,
+      "max_abs_error": 225,
+      "mean_abs_error": 37.16601307189543,
+      "root_mean_squared_error": 61.200055785456776,
+      "max_relative_error_nonzero_products": 0.058823529411764705,
+      "mean_relative_error_nonzero_products": 0.008969897090241787,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    },
+    {
+      "mode": "ratio",
+      "threshold": 4.0,
+      "stages": "ll_only",
+      "domain": [
+        -127,
+        127
+      ],
+      "axis_order": [
+        "activation",
+        "weight"
+      ],
+      "offset": 127,
+      "partial_product_order": [
+        "HH",
+        "HL",
+        "LH",
+        "LL"
+      ],
+      "threshold_comparison": ">= (ties stop)",
+      "zero_term_optimization": false,
+      "pair_count": 65025,
+      "stage_counts": {
+        "1": 0,
+        "2": 0,
+        "3": 59997,
+        "4": 5028
+      },
+      "attempted_term_counts": {
+        "HH": 65025,
+        "HL": 65025,
+        "LH": 65025,
+        "LL": 5028
+      },
+      "full_term_slots": 260100,
+      "executed_term_slots": 200103,
+      "mean_terms_per_pair": 3.0773241061130334,
+      "saved_term_fraction": 0.23066897347174165,
+      "full_nonzero_terms": 215296,
+      "executed_nonzero_terms": 162724,
+      "saved_nonzero_term_fraction": 0.24418475029726516,
+      "changed_pair_count": 52572,
+      "max_abs_error": 225,
+      "mean_abs_error": 51.1359630911188,
+      "root_mean_squared_error": 73.5921677292885,
+      "max_relative_error_nonzero_products": 0.2,
+      "mean_relative_error_nonzero_products": 0.024229291217708594,
+      "bound_violation_count": 0,
+      "magnitude_overshoot_count": 0,
+      "distribution_note": "Uniform Cartesian integer-domain statistics; model-weighted counts must be measured separately.",
+      "hardware_note": "Term-slot reductions exclude comparison/control overhead and do not establish PE-array cycle speedup."
+    }
+  ]
+}

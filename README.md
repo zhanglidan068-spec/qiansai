@@ -11,6 +11,7 @@ GitHub 仓库：<https://github.com/zhanglidan068-spec/qiansai>
 - [W16A16、浮点非线性运行方法](README_量化运行方法.md)
 - [W8A8、N16 运行方法](README_W8A8_N16运行方法.md)
 - [逐层精度搜索与独立复核](README_逐层精度搜索.md)
+- [W8A8 四位部分积提前停止实验](README_四位渐进乘法运行方法.md)
 - [硬件行为模型、配置及测试](hw_model/README.md)
 - [混合精度硬件接口规格](hardware_precision_spec.md)
 - [赛题面积口径审计](area_requirements_audit.md)
