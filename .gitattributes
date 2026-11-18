@@ -1,2 +1,3 @@
 # Preserve the exact bytes used by the bundled SHA-256 regression manifest.
 hw_model/reference_results/** -text whitespace=cr-at-eol
+backup/latest_nibble_results/** -text whitespace=cr-at-eol
